@@ -20,9 +20,11 @@ func getConfig() throws -> Config {
 
 do {
     let config = try getConfig()
-    let message = Message(roomId: config.chatwork.roomId, text: "Hello, This is MonchCLI!")
+    let request = CreateMessageRequest(roomId: config.chatwork.roomId, text: "Hello, This is MonchCLI!")
     let client = ChatworkClient(config: config.chatwork)
-    client.send(message)
+    client.send(request) { messageResponse in
+        print("MessageId = \(messageResponse.messageId)")
+    }
 } catch {
     print(error.localizedDescription)
 }

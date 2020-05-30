@@ -8,30 +8,16 @@
 import Foundation
 
 struct ChatworkClient {
+    static let baseUrl = "https://api.chatwork.com/v2"
     private let config: Config.Chatwork
 
     init(config: Config.Chatwork) {
         self.config = config
     }
 
-    func send(_ message: Message) {
-        let baseUrl = "https://api.chatwork.com/v2"
-        let urlString = "\(baseUrl)/rooms/\(message.roomId)/messages"
-        guard let url = URL(string: urlString) else { return }
-        let httpBody: Data
-        do {
-            httpBody = try XWWWFormUrlEncoder().encode(message)
-        } catch {
-            fatalError(error.localizedDescription)
-        }
-        let request: URLRequest = { url, httpBody in
-            var request = URLRequest.init(url: url)
-            request.httpMethod = "POST"
-            request.setValue(config.token, forHTTPHeaderField: "X-ChatWorkToken")
-            request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            request.httpBody = httpBody
-            return request
-        }(url, httpBody)
+    func send<Request: ApiRequest>(_ request: Request, completionHandler: @escaping (_ response: Request.ApiResponse) -> Void) {
+        guard var request = request.makeURLRequest(baseUrl: Self.baseUrl) else { return }
+        request.setValue(config.token, forHTTPHeaderField: "X-ChatWorkToken")
 
         let semaphore = DispatchSemaphore(value: 0)
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
@@ -49,8 +35,8 @@ struct ChatworkClient {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             do {
-                let decoded = try decoder.decode(CreateMessageResponse.self, from: data)
-                print("MessageId: \(decoded.messageId)")
+                let decoded = try decoder.decode(Request.ApiResponse.self, from: data)
+                completionHandler(decoded)
             } catch let decodeError {
                 fatalError(decodeError.localizedDescription)
             }

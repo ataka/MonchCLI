@@ -20,11 +20,7 @@ struct ChatworkClient {
         guard let url = URL(string: urlString) else { return }
         let httpBody: Data
         do {
-            let encoder = JSONEncoder.init()
-            encoder.dataEncodingStrategy = .deferredToData
-            encoder.outputFormatting = .prettyPrinted
-            httpBody = try encoder.encode(message)
-
+            httpBody = try XWWWFormUrlEncoder().encode(message)
         } catch {
             fatalError(error.localizedDescription)
         }
@@ -33,7 +29,7 @@ struct ChatworkClient {
             request.httpMethod = "POST"
             request.setValue(token, forHTTPHeaderField: "X-ChatWorkToken")
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
-            request.httpBody = "body=\(message.text)&self_unread=0".data(using: .utf8)
+            request.httpBody = httpBody
             return request
         }(url, httpBody)
 

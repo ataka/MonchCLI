@@ -18,21 +18,6 @@ func getConfig() throws -> Config {
     return try PropertyListDecoder().decode(Config.self, from: data)
 }
 
-struct Message: Encodable {
-    let roomId: Int
-    let text: String
-    private let selfUnread: Int = 0
-
-    private enum CodingKeys: String, CodingKey {
-        case text = "body"
-        case selfUnread = "self_unread"
-    }
-}
-
-struct CreateMessageResponse: Decodable {
-    let messageId: String
-}
-
 struct ChatworkClient {
     private let token: String
 

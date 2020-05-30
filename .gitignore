@@ -94,3 +94,6 @@ iOSInjectionProject/
 
 # MonchCLI
 config.plist
+
+# Mac
+.DS_Store

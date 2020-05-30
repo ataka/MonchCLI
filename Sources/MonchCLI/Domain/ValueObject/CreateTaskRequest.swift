@@ -10,9 +10,15 @@ import Foundation
 struct CreateTaskRequest: ChatworkApiRequest {
     typealias ApiResponse = CreateTaskResponse
 
+    enum LimitType: String, Encodable {
+        case none
+        case date
+        case time
+    }
+
     let roomId: Int
     let text: String
-    let limitType: String
+    let limitType: LimitType
     let assigneeIds: [Int]
 
     private enum CodingKeys: String, CodingKey {

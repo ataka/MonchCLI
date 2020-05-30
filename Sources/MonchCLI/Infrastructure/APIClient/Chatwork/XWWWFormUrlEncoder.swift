@@ -241,7 +241,7 @@ fileprivate struct XWWWFormUrlUnkeyedEncoding: UnkeyedEncodingContainer {
 
     mutating func encode<T>(_ value: T) throws where T : Encodable {
         var encoding = XWWWFormUrlEncoding(data: data)
-        encoding.codingPath.append(nextIndexedKey())
+        encoding.codingPath = codingPath
         try value.encode(to: encoding)
     }
 

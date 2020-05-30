@@ -8,6 +8,12 @@
 import Foundation
 
 struct Config: Decodable {
-    let chatworkToken: String
-    let roomId: Int
+    let chatwork: Chatwork
+}
+
+extension Config {
+    struct Chatwork: Decodable {
+        let token: String
+        let roomId: Int
+    }
 }

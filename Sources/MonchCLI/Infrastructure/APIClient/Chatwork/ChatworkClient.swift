@@ -8,10 +8,10 @@
 import Foundation
 
 struct ChatworkClient {
-    private let token: String
+    private let config: Config.Chatwork
 
-    init(config: Config) {
-        token = config.chatworkToken
+    init(config: Config.Chatwork) {
+        self.config = config
     }
 
     func send(_ message: Message) {
@@ -27,7 +27,7 @@ struct ChatworkClient {
         let request: URLRequest = { url, httpBody in
             var request = URLRequest.init(url: url)
             request.httpMethod = "POST"
-            request.setValue(token, forHTTPHeaderField: "X-ChatWorkToken")
+            request.setValue(config.token, forHTTPHeaderField: "X-ChatWorkToken")
             request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
             request.httpBody = httpBody
             return request

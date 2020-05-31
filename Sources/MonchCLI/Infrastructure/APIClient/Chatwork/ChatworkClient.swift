@@ -19,7 +19,6 @@ struct ChatworkClient {
         guard var request = request.makeURLRequest(baseUrl: Self.baseUrl) else { return }
         request.setValue(config.token, forHTTPHeaderField: "X-ChatWorkToken")
 
-        let semaphore = DispatchSemaphore(value: 0)
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard error == nil else {
                 fatalError(error!.localizedDescription)
@@ -42,6 +41,5 @@ struct ChatworkClient {
             }
         }
         task.resume()
-        semaphore.wait()
     }
 }

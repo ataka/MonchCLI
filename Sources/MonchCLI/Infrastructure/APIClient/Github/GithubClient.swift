@@ -21,7 +21,6 @@ struct GithubClient {
         guard var request = request.makeURLRequest(baseUrl: baseUrl) else { return }
         request.setValue(authorization, forHTTPHeaderField: "Authorization")
 
-        let semaphore = DispatchSemaphore(value: 0)
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
             guard error == nil else {
                 fatalError(error!.localizedDescription)
@@ -44,7 +43,6 @@ struct GithubClient {
             }
         }
         task.resume()
-        semaphore.wait()
     }
 
     private var authorization: String { "token \(config.token)" }

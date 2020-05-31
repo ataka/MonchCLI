@@ -34,11 +34,12 @@ fileprivate struct XWWWFormUrlEncoding: Encoder {
     }
     fileprivate var storage: Storage
 
-    init(storage: Storage = Storage()) {
+    init(storage: Storage = Storage(), codingPath: [CodingKey] = []) {
         self.storage = storage
+        self.codingPath = codingPath
     }
 
-    var codingPath: [CodingKey] = []
+    var codingPath: [CodingKey]
 
     var userInfo: [CodingUserInfoKey : Any] = [:]
 
@@ -83,8 +84,7 @@ fileprivate struct XWWWFormUrlKeyedEncoding<Key: CodingKey>: KeyedEncodingContai
     mutating func encode(_ value: UInt64, forKey key: Key) throws { storage.push(key: codingPath + [key], value: String(describing: value)) }
 
     mutating func encode<T>(_ value: T, forKey key: Key) throws where T : Encodable {
-        var encoding = XWWWFormUrlEncoding(storage: storage)
-        encoding.codingPath.append(key)
+        let encoding = XWWWFormUrlEncoding(storage: storage, codingPath: [key])
         try value.encode(to: encoding)
     }
 
@@ -103,9 +103,7 @@ fileprivate struct XWWWFormUrlKeyedEncoding<Key: CodingKey>: KeyedEncodingContai
     }
 
     mutating func superEncoder(forKey key: Key) -> Encoder {
-        var encoding = XWWWFormUrlEncoding(storage: storage)
-        encoding.codingPath.append(key)
-        return encoding
+        XWWWFormUrlEncoding(storage: storage, codingPath: [key])
     }
 }
 
@@ -154,8 +152,7 @@ fileprivate struct XWWWFormUrlUnkeyedEncoding: UnkeyedEncodingContainer {
     mutating func encode(_ value: UInt64) throws { storage.push(key: codingPath + [nextIndexedKey()], value: String(describing: value)) }
 
     mutating func encode<T>(_ value: T) throws where T : Encodable {
-        var encoding = XWWWFormUrlEncoding(storage: storage)
-        encoding.codingPath = codingPath
+        let encoding = XWWWFormUrlEncoding(storage: storage, codingPath: codingPath)
         try value.encode(to: encoding)
     }
 
@@ -169,9 +166,7 @@ fileprivate struct XWWWFormUrlUnkeyedEncoding: UnkeyedEncodingContainer {
     }
 
     mutating func superEncoder() -> Encoder {
-        var encoding = XWWWFormUrlEncoding(storage: storage)
-        encoding.codingPath.append(nextIndexedKey())
-        return encoding
+        XWWWFormUrlEncoding(storage: storage, codingPath: [nextIndexedKey()])
     }
 }
 
@@ -203,8 +198,7 @@ fileprivate struct XWWWFormUrlSingleValueEncoding: SingleValueEncodingContainer 
     mutating func encode(_ value: UInt64) throws { storage.push(key: codingPath, value: String(describing: value)) }
 
     mutating func encode<T>(_ value: T) throws where T : Encodable {
-        var encoding = XWWWFormUrlEncoding(storage: storage)
-        encoding.codingPath = codingPath
+        let encoding = XWWWFormUrlEncoding(storage: storage, codingPath: codingPath)
         try value.encode(to: encoding)
     }
 }

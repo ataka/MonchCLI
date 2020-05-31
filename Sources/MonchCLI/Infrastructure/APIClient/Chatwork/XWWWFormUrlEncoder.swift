@@ -12,7 +12,7 @@ final class XWWWFormUrlEncoder {
     func encode<T>(_ value: T) throws -> Data where T : Encodable {
         let encoding = XWWWFormUrlEncoding()
         try value.encode(to: encoding)
-        return format(from: encoding.data.strings)
+        return format(from: encoding.storage.strings)
     }
 
     private func format(from keyValues: [String: String]) -> Data {
@@ -24,7 +24,7 @@ final class XWWWFormUrlEncoder {
 }
 
 fileprivate struct XWWWFormUrlEncoding: Encoder {
-    fileprivate final class Data {
+    fileprivate final class Storage {
         private(set) var strings: [String: String] = [:]
 
         func encode(key codingKey: [CodingKey], value: String) {
@@ -32,10 +32,10 @@ fileprivate struct XWWWFormUrlEncoding: Encoder {
             strings[key] = value
         }
     }
-    fileprivate var data: Data
+    fileprivate var storage: Storage
 
-    init(data encodedData: Data = Data()) {
-        self.data = encodedData
+    init(storage: Storage = Storage()) {
+        self.storage = storage
     }
 
     var codingPath: [CodingKey] = []
@@ -43,100 +43,59 @@ fileprivate struct XWWWFormUrlEncoding: Encoder {
     var userInfo: [CodingUserInfoKey : Any] = [:]
 
     func container<Key>(keyedBy type: Key.Type) -> KeyedEncodingContainer<Key> where Key : CodingKey {
-        let container = XWWWFormUrlKeyedEncoding<Key>(data: data, codingPath: codingPath)
+        let container = XWWWFormUrlKeyedEncoding<Key>(storage: storage, codingPath: codingPath)
         return KeyedEncodingContainer(container)
     }
 
     func unkeyedContainer() -> UnkeyedEncodingContainer {
-        XWWWFormUrlUnkeyedEncoding(data: data, codingPath: codingPath)
+        XWWWFormUrlUnkeyedEncoding(storage: storage, codingPath: codingPath)
     }
 
     func singleValueContainer() -> SingleValueEncodingContainer {
-        XWWWFormUrlSingleValueEncoding(data: data, codingPath: codingPath)
+        XWWWFormUrlSingleValueEncoding(storage: storage, codingPath: codingPath)
     }
 }
 
 fileprivate struct XWWWFormUrlKeyedEncoding<Key: CodingKey>: KeyedEncodingContainerProtocol {
 
-    private let data: XWWWFormUrlEncoding.Data
+    private let storage: XWWWFormUrlEncoding.Storage
     var codingPath: [CodingKey]
 
-    init(data: XWWWFormUrlEncoding.Data, codingPath: [CodingKey]) {
-        self.data = data
+    init(storage: XWWWFormUrlEncoding.Storage, codingPath: [CodingKey]) {
+        self.storage = storage
         self.codingPath = codingPath
     }
 
     mutating func encodeNil(forKey key: Key) throws {}
 
-    mutating func encode(_ value: Bool, forKey key: Key) throws {
-        data.encode(key: codingPath + [key], value: value.description)
-    }
-
-    mutating func encode(_ value: String, forKey key: Key) throws {
-        data.encode(key: codingPath + [key], value: value)
-    }
-
-    mutating func encode(_ value: Double, forKey key: Key) throws {
-        data.encode(key: codingPath + [key], value: value.description)
-    }
-
-    mutating func encode(_ value: Float, forKey key: Key) throws {
-        data.encode(key: codingPath + [key], value: value.description)
-    }
-
-    mutating func encode(_ value: Int, forKey key: Key) throws {
-        data.encode(key: codingPath + [key], value: value.description)
-    }
-
-    mutating func encode(_ value: Int8, forKey key: Key) throws {
-        data.encode(key: codingPath + [key], value: value.description)
-    }
-
-    mutating func encode(_ value: Int16, forKey key: Key) throws {
-        data.encode(key: codingPath + [key], value: value.description)
-    }
-
-    mutating func encode(_ value: Int32, forKey key: Key) throws {
-        data.encode(key: codingPath + [key], value: value.description)
-    }
-
-    mutating func encode(_ value: Int64, forKey key: Key) throws {
-        data.encode(key: codingPath + [key], value: value.description)
-    }
-
-    mutating func encode(_ value: UInt, forKey key: Key) throws {
-        data.encode(key: codingPath + [key], value: value.description)
-    }
-
-    mutating func encode(_ value: UInt8, forKey key: Key) throws {
-        data.encode(key: codingPath + [key], value: value.description)
-    }
-
-    mutating func encode(_ value: UInt16, forKey key: Key) throws {
-        data.encode(key: codingPath + [key], value: value.description)
-    }
-
-    mutating func encode(_ value: UInt32, forKey key: Key) throws {
-        data.encode(key: codingPath + [key], value: value.description)
-    }
-
-    mutating func encode(_ value: UInt64, forKey key: Key) throws {
-        data.encode(key: codingPath + [key], value: value.description)
-    }
+    mutating func encode(_ value: Bool,   forKey key: Key) throws { storage.encode(key: codingPath + [key], value: value.description) }
+    mutating func encode(_ value: String, forKey key: Key) throws { storage.encode(key: codingPath + [key], value: value) }
+    mutating func encode(_ value: Double, forKey key: Key) throws { storage.encode(key: codingPath + [key], value: value.description) }
+    mutating func encode(_ value: Float,  forKey key: Key) throws { storage.encode(key: codingPath + [key], value: value.description) }
+    mutating func encode(_ value: Int,    forKey key: Key) throws { storage.encode(key: codingPath + [key], value: value.description) }
+    mutating func encode(_ value: Int8,   forKey key: Key) throws { storage.encode(key: codingPath + [key], value: value.description) }
+    mutating func encode(_ value: Int16,  forKey key: Key) throws { storage.encode(key: codingPath + [key], value: value.description) }
+    mutating func encode(_ value: Int32,  forKey key: Key) throws { storage.encode(key: codingPath + [key], value: value.description) }
+    mutating func encode(_ value: Int64,  forKey key: Key) throws { storage.encode(key: codingPath + [key], value: value.description) }
+    mutating func encode(_ value: UInt,   forKey key: Key) throws { storage.encode(key: codingPath + [key], value: value.description) }
+    mutating func encode(_ value: UInt8,  forKey key: Key) throws { storage.encode(key: codingPath + [key], value: value.description) }
+    mutating func encode(_ value: UInt16, forKey key: Key) throws { storage.encode(key: codingPath + [key], value: value.description) }
+    mutating func encode(_ value: UInt32, forKey key: Key) throws { storage.encode(key: codingPath + [key], value: value.description) }
+    mutating func encode(_ value: UInt64, forKey key: Key) throws { storage.encode(key: codingPath + [key], value: value.description) }
 
     mutating func encode<T>(_ value: T, forKey key: Key) throws where T : Encodable {
-        var encoding = XWWWFormUrlEncoding(data: data)
+        var encoding = XWWWFormUrlEncoding(storage: storage)
         encoding.codingPath.append(key)
         try value.encode(to: encoding)
     }
 
     mutating func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type, forKey key: Key) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
-        let container = XWWWFormUrlKeyedEncoding<NestedKey>(data: data, codingPath: codingPath + [key])
+        let container = XWWWFormUrlKeyedEncoding<NestedKey>(storage: storage, codingPath: codingPath + [key])
         return KeyedEncodingContainer(container)
     }
 
     mutating func nestedUnkeyedContainer(forKey key: Key) -> UnkeyedEncodingContainer {
-        XWWWFormUrlUnkeyedEncoding(data: data, codingPath: codingPath + [key])
+        XWWWFormUrlUnkeyedEncoding(storage: storage, codingPath: codingPath + [key])
     }
 
     mutating func superEncoder() -> Encoder {
@@ -145,7 +104,7 @@ fileprivate struct XWWWFormUrlKeyedEncoding<Key: CodingKey>: KeyedEncodingContai
     }
 
     mutating func superEncoder(forKey key: Key) -> Encoder {
-        var encoding = XWWWFormUrlEncoding(data: data)
+        var encoding = XWWWFormUrlEncoding(storage: storage)
         encoding.codingPath.append(key)
         return encoding
     }
@@ -153,12 +112,12 @@ fileprivate struct XWWWFormUrlKeyedEncoding<Key: CodingKey>: KeyedEncodingContai
 
 fileprivate struct XWWWFormUrlUnkeyedEncoding: UnkeyedEncodingContainer {
 
-    private let data: XWWWFormUrlEncoding.Data
+    private let storage: XWWWFormUrlEncoding.Storage
     var codingPath: [CodingKey]
     private(set) var count: Int = 0
 
-    init(data: XWWWFormUrlEncoding.Data, codingPath: [CodingKey]) {
-        self.data = data
+    init(storage: XWWWFormUrlEncoding.Storage, codingPath: [CodingKey]) {
+        self.storage = storage
         self.codingPath = codingPath
     }
 
@@ -179,83 +138,39 @@ fileprivate struct XWWWFormUrlUnkeyedEncoding: UnkeyedEncodingContainer {
         return IndexedCodingKey(intValue: count)!
     }
 
-    mutating func encodeNil() throws {
-        _ = nextIndexedKey()
-    }
-
-    mutating func encode(_ value: Bool) throws {
-        data.encode(key: codingPath + [nextIndexedKey()], value: value.description)
-    }
-
-    mutating func encode(_ value: String) throws {
-        data.encode(key: codingPath + [nextIndexedKey()], value: value)
-    }
-
-    mutating func encode(_ value: Double) throws {
-        data.encode(key: codingPath + [nextIndexedKey()], value: value.description)
-    }
-
-    mutating func encode(_ value: Float) throws {
-        data.encode(key: codingPath + [nextIndexedKey()], value: value.description)
-    }
-
-    mutating func encode(_ value: Int) throws {
-        data.encode(key: codingPath + [nextIndexedKey()], value: value.description)
-    }
-
-    mutating func encode(_ value: Int8) throws {
-        data.encode(key: codingPath + [nextIndexedKey()], value: value.description)
-    }
-
-    mutating func encode(_ value: Int16) throws {
-        data.encode(key: codingPath + [nextIndexedKey()], value: value.description)
-    }
-
-    mutating func encode(_ value: Int32) throws {
-        data.encode(key: codingPath + [nextIndexedKey()], value: value.description)
-    }
-
-    mutating func encode(_ value: Int64) throws {
-        data.encode(key: codingPath + [nextIndexedKey()], value: value.description)
-    }
-
-    mutating func encode(_ value: UInt) throws {
-        data.encode(key: codingPath + [nextIndexedKey()], value: value.description)
-    }
-
-    mutating func encode(_ value: UInt8) throws {
-        data.encode(key: codingPath + [nextIndexedKey()], value: value.description)
-    }
-
-    mutating func encode(_ value: UInt16) throws {
-        data.encode(key: codingPath + [nextIndexedKey()], value: value.description)
-    }
-
-    mutating func encode(_ value: UInt32) throws {
-        data.encode(key: codingPath + [nextIndexedKey()], value: value.description)
-    }
-
-    mutating func encode(_ value: UInt64) throws {
-        data.encode(key: codingPath + [nextIndexedKey()], value: value.description)
-    }
+    mutating func encodeNil() throws { _ = nextIndexedKey() }
+    mutating func encode(_ value: Bool)   throws { storage.encode(key: codingPath + [nextIndexedKey()], value: value.description) }
+    mutating func encode(_ value: String) throws { storage.encode(key: codingPath + [nextIndexedKey()], value: value) }
+    mutating func encode(_ value: Double) throws { storage.encode(key: codingPath + [nextIndexedKey()], value: value.description) }
+    mutating func encode(_ value: Float)  throws { storage.encode(key: codingPath + [nextIndexedKey()], value: value.description) }
+    mutating func encode(_ value: Int)    throws { storage.encode(key: codingPath + [nextIndexedKey()], value: value.description) }
+    mutating func encode(_ value: Int8)   throws { storage.encode(key: codingPath + [nextIndexedKey()], value: value.description) }
+    mutating func encode(_ value: Int16)  throws { storage.encode(key: codingPath + [nextIndexedKey()], value: value.description) }
+    mutating func encode(_ value: Int32)  throws { storage.encode(key: codingPath + [nextIndexedKey()], value: value.description) }
+    mutating func encode(_ value: Int64)  throws { storage.encode(key: codingPath + [nextIndexedKey()], value: value.description) }
+    mutating func encode(_ value: UInt)   throws { storage.encode(key: codingPath + [nextIndexedKey()], value: value.description) }
+    mutating func encode(_ value: UInt8)  throws { storage.encode(key: codingPath + [nextIndexedKey()], value: value.description) }
+    mutating func encode(_ value: UInt16) throws { storage.encode(key: codingPath + [nextIndexedKey()], value: value.description) }
+    mutating func encode(_ value: UInt32) throws { storage.encode(key: codingPath + [nextIndexedKey()], value: value.description) }
+    mutating func encode(_ value: UInt64) throws { storage.encode(key: codingPath + [nextIndexedKey()], value: value.description) }
 
     mutating func encode<T>(_ value: T) throws where T : Encodable {
-        var encoding = XWWWFormUrlEncoding(data: data)
+        var encoding = XWWWFormUrlEncoding(storage: storage)
         encoding.codingPath = codingPath
         try value.encode(to: encoding)
     }
 
     mutating func nestedContainer<NestedKey>(keyedBy keyType: NestedKey.Type) -> KeyedEncodingContainer<NestedKey> where NestedKey : CodingKey {
-        let container = XWWWFormUrlKeyedEncoding<NestedKey>(data: data, codingPath: codingPath + [nextIndexedKey()])
+        let container = XWWWFormUrlKeyedEncoding<NestedKey>(storage: storage, codingPath: codingPath + [nextIndexedKey()])
         return KeyedEncodingContainer(container)
     }
 
     mutating func nestedUnkeyedContainer() -> UnkeyedEncodingContainer {
-        XWWWFormUrlUnkeyedEncoding(data: data, codingPath: codingPath + [nextIndexedKey()])
+        XWWWFormUrlUnkeyedEncoding(storage: storage, codingPath: codingPath + [nextIndexedKey()])
     }
 
     mutating func superEncoder() -> Encoder {
-        var encoding = XWWWFormUrlEncoding(data: data)
+        var encoding = XWWWFormUrlEncoding(storage: storage)
         encoding.codingPath.append(nextIndexedKey())
         return encoding
     }
@@ -263,75 +178,33 @@ fileprivate struct XWWWFormUrlUnkeyedEncoding: UnkeyedEncodingContainer {
 
 fileprivate struct XWWWFormUrlSingleValueEncoding: SingleValueEncodingContainer {
 
-    private let data: XWWWFormUrlEncoding.Data
+    private let storage: XWWWFormUrlEncoding.Storage
     var codingPath: [CodingKey]
     private(set) var count: Int = 0
 
-    init(data: XWWWFormUrlEncoding.Data, codingPath: [CodingKey]) {
-        self.data = data
+    init(storage: XWWWFormUrlEncoding.Storage, codingPath: [CodingKey]) {
+        self.storage = storage
         self.codingPath = codingPath
     }
 
     mutating func encodeNil() throws {}
-
-    mutating func encode(_ value: Bool) throws {
-        data.encode(key: codingPath, value: value.description)
-    }
-
-    mutating func encode(_ value: String) throws {
-        data.encode(key: codingPath, value: value)
-    }
-
-    mutating func encode(_ value: Double) throws {
-        data.encode(key: codingPath, value: value.description)
-    }
-
-    mutating func encode(_ value: Float) throws {
-        data.encode(key: codingPath, value: value.description)
-    }
-
-    mutating func encode(_ value: Int) throws {
-        data.encode(key: codingPath, value: value.description)
-    }
-
-    mutating func encode(_ value: Int8) throws {
-        data.encode(key: codingPath, value: value.description)
-    }
-
-    mutating func encode(_ value: Int16) throws {
-        data.encode(key: codingPath, value: value.description)
-    }
-
-    mutating func encode(_ value: Int32) throws {
-        data.encode(key: codingPath, value: value.description)
-    }
-
-    mutating func encode(_ value: Int64) throws {
-        data.encode(key: codingPath, value: value.description)
-    }
-
-    mutating func encode(_ value: UInt) throws {
-        data.encode(key: codingPath, value: value.description)
-    }
-
-    mutating func encode(_ value: UInt8) throws {
-        data.encode(key: codingPath, value: value.description)
-    }
-
-    mutating func encode(_ value: UInt16) throws {
-        data.encode(key: codingPath, value: value.description)
-    }
-
-    mutating func encode(_ value: UInt32) throws {
-        data.encode(key: codingPath, value: value.description)
-    }
-
-    mutating func encode(_ value: UInt64) throws {
-        data.encode(key: codingPath, value: value.description)
-    }
+    mutating func encode(_ value: Bool)   throws { storage.encode(key: codingPath, value: value.description) }
+    mutating func encode(_ value: String) throws { storage.encode(key: codingPath, value: value) }
+    mutating func encode(_ value: Double) throws { storage.encode(key: codingPath, value: value.description) }
+    mutating func encode(_ value: Float)  throws { storage.encode(key: codingPath, value: value.description) }
+    mutating func encode(_ value: Int)    throws { storage.encode(key: codingPath, value: value.description) }
+    mutating func encode(_ value: Int8)   throws { storage.encode(key: codingPath, value: value.description) }
+    mutating func encode(_ value: Int16)  throws { storage.encode(key: codingPath, value: value.description) }
+    mutating func encode(_ value: Int32)  throws { storage.encode(key: codingPath, value: value.description) }
+    mutating func encode(_ value: Int64)  throws { storage.encode(key: codingPath, value: value.description) }
+    mutating func encode(_ value: UInt)   throws { storage.encode(key: codingPath, value: value.description) }
+    mutating func encode(_ value: UInt8)  throws { storage.encode(key: codingPath, value: value.description) }
+    mutating func encode(_ value: UInt16) throws { storage.encode(key: codingPath, value: value.description) }
+    mutating func encode(_ value: UInt32) throws { storage.encode(key: codingPath, value: value.description) }
+    mutating func encode(_ value: UInt64) throws { storage.encode(key: codingPath, value: value.description) }
 
     mutating func encode<T>(_ value: T) throws where T : Encodable {
-        var encoding = XWWWFormUrlEncoding(data: data)
+        var encoding = XWWWFormUrlEncoding(storage: storage)
         encoding.codingPath = codingPath
         try value.encode(to: encoding)
     }

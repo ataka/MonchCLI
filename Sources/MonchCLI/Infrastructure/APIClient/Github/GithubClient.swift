@@ -17,11 +17,9 @@ struct GithubClient {
         baseUrl = "\(Self.rootUrl)/repos/\(config.repository)"
     }
 
-    func send<Request: GithubApiRequest>(_ request: Request, completionHandler: @escaping (_ response: Request.ApiResponse) -> Void) {
+    func send<Request: GithubApiRequest>(_ request: Request, completionHandler: @escaping (_ response: Request.Response) -> Void) {
         guard var request = request.makeURLRequest(baseUrl: baseUrl) else { return }
         request.setValue(authorization, forHTTPHeaderField: "Authorization")
-        request.setValue("application/vnd.github.sailor-v-preview+json", forHTTPHeaderField: "Accept")
-        request.setValue("application/json; charset=utf-8", forHTTPHeaderField: "Content-Type")
 
         let semaphore = DispatchSemaphore(value: 0)
         let task = URLSession.shared.dataTask(with: request) { data, response, error in
@@ -39,7 +37,7 @@ struct GithubClient {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             do {
-                let decoded = try decoder.decode(Request.ApiResponse.self, from: data)
+                let decoded = try decoder.decode(Request.Response.self, from: data)
                 completionHandler(decoded)
             } catch let decodeError {
                 fatalError(decodeError.localizedDescription)

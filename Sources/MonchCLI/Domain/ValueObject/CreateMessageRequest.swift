@@ -8,7 +8,7 @@
 import Foundation
 
 struct CreateMessageRequest: ChatworkApiRequest {
-    typealias ApiResponse = CreateMessageResponse
+    typealias Response = CreateMessageResponse
 
     let roomId: Int
     let text: String
@@ -22,6 +22,6 @@ struct CreateMessageRequest: ChatworkApiRequest {
     var path: String { "rooms/\(roomId)/messages" }
 }
 
-struct CreateMessageResponse: Decodable {
+struct CreateMessageResponse: ChatworkApiResponse {
     let messageId: String
 }

@@ -8,7 +8,7 @@
 import Foundation
 
 struct CreateTaskRequest: ChatworkApiRequest {
-    typealias ApiResponse = CreateTaskResponse
+    typealias Response = CreateTaskResponse
 
     enum LimitType: String, Encodable {
         case none
@@ -30,6 +30,6 @@ struct CreateTaskRequest: ChatworkApiRequest {
     var path: String { "rooms/\(roomId)/tasks" }
 }
 
-struct CreateTaskResponse: Decodable {
+struct CreateTaskResponse: ChatworkApiResponse {
     let taskIds: [Int]
 }

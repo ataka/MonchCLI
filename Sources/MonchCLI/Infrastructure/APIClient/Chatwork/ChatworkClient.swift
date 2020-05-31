@@ -15,7 +15,7 @@ struct ChatworkClient {
         self.config = config
     }
 
-    func send<Request: ApiRequest>(_ request: Request, completionHandler: @escaping (_ response: Request.ApiResponse) -> Void) {
+    func send<Request: ChatworkApiRequest>(_ request: Request, completionHandler: @escaping (_ response: Request.Response) -> Void) {
         guard var request = request.makeURLRequest(baseUrl: Self.baseUrl) else { return }
         request.setValue(config.token, forHTTPHeaderField: "X-ChatWorkToken")
 
@@ -35,7 +35,7 @@ struct ChatworkClient {
             let decoder = JSONDecoder()
             decoder.keyDecodingStrategy = .convertFromSnakeCase
             do {
-                let decoded = try decoder.decode(Request.ApiResponse.self, from: data)
+                let decoded = try decoder.decode(Request.Response.self, from: data)
                 completionHandler(decoded)
             } catch let decodeError {
                 fatalError(decodeError.localizedDescription)

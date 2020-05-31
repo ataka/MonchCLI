@@ -8,6 +8,7 @@
 import Foundation
 
 protocol GithubApiRequest: ApiRequest {}
+protocol GithubApiResponse: ApiResponse {}
 
 extension GithubApiRequest {
     func makeURLRequest(baseUrl: String) -> URLRequest? {
@@ -18,14 +19,7 @@ extension GithubApiRequest {
         } catch {
             fatalError(error.localizedDescription)
         }
-        var comp = URLComponents.init(url: URL(string: "\(baseUrl)/\(path)")!, resolvingAgainstBaseURL: false)
-        let queryItems = [
-            URLQueryItem(name: "state", value: "open"),
-        ]
-        comp?.queryItems = queryItems
-
-        //guard let url = URL(string: "\(baseUrl)/\(path)?\(param)") else { return nil }
-        guard let url = comp?.url else { return nil }
+        guard let url = URL(string: "\(baseUrl)/\(path)?\(param)") else { return nil }
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"

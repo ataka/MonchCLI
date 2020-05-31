@@ -8,9 +8,13 @@
 import Foundation
 
 struct ListPullRequestsRequest: GithubApiRequest {
-    typealias ApiResponse = Array<PullRequest>
+    typealias Response = Array<PullRequest>
 
-    let state: String = "open"
+    let state: PullRequest.State
+
+    init(state: PullRequest.State = .open) {
+        self.state = state
+    }
 
     private enum CodingKeys: String, CodingKey {
         case state
@@ -19,8 +23,4 @@ struct ListPullRequestsRequest: GithubApiRequest {
     var path = "pulls"
 }
 
-struct PullRequest: Decodable {
-    let id: Int
-    let url: String
-    let title: String
-}
+extension Array: ApiResponse where Element == PullRequest {}

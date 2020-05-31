@@ -7,13 +7,8 @@
 
 import Foundation
 
-protocol ApiRequest: Encodable {
-    associatedtype ApiResponse: Decodable
-    var path: String { get }
-    func makeURLRequest(baseUrl: String) -> URLRequest?
-}
-
 protocol ChatworkApiRequest: ApiRequest {}
+protocol ChatworkApiResponse: ApiResponse {}
 
 extension ChatworkApiRequest {
     func makeURLRequest(baseUrl: String) -> URLRequest? {

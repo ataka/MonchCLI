@@ -85,6 +85,7 @@ func main() {
     selectPullRequests(with: config) { pullRequest in
         requestCodeReview(for: pullRequest, with: config) {
             print("タスクを振りました。")
+            semaphore.signal()
         }
     }
     semaphore.wait()

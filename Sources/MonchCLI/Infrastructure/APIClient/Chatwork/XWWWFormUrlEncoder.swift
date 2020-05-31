@@ -29,7 +29,11 @@ fileprivate struct XWWWFormUrlEncoding: Encoder {
 
         func push(key codingKey: [CodingKey], value: String) {
             let key = codingKey.map { $0.stringValue }.joined(separator: ".")
-            strings[key] = value
+            if let old = strings[key] {
+                strings[key] = "\(old),\(value)"
+            } else {
+                strings[key] = value
+            }
         }
     }
     fileprivate var storage: Storage

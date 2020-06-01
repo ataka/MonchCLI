@@ -31,5 +31,6 @@ extension Config {
     struct Reviewer: Decodable {
         let name: String
         let chatworkId: Int
+        let githubLogin: String
     }
 }

@@ -54,7 +54,7 @@ func requestCodeReview(for pullRequest: PullRequest, with config: Config, comple
 
     let text = """
     \(pullRequest.title)
-    \(pullRequest.url)
+    \(pullRequest.htmlUrl)
 
     レビューをお願いします (please)
     """

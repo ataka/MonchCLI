@@ -15,6 +15,6 @@ struct PullRequest: ApiResponse {
     }
 
     let id: Int
-    let url: String
+    let htmlUrl: String
     let title: String
 }

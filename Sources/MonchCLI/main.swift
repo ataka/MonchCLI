@@ -99,7 +99,7 @@ func requestCodeReview(for pullRequest: PullRequest, with config: Config, comple
     let request = CreateTaskRequest(roomId: config.chatwork.roomId, text: text, assigneeIds: assignees.map { $0.chatworkId}, limitType: .date, deadline: deadline)
     let chatworkClient = ChatworkClient(config: config.chatwork)
     chatworkClient.send(request) { taskResponse in
-        let request = CreateReviewRequestRequest(pullRequestId: pullRequest.id, reviewers: assignees.map { $0.githubLogin })
+        let request = CreateReviewRequestRequest(pullRequestId: pullRequest.number, reviewers: assignees.map { $0.githubLogin })
         let githubClient = GithubClient(config: config.github)
         githubClient.send(request) { pullRequest in
             completionHandler()

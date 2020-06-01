@@ -17,4 +17,5 @@ struct PullRequest: ApiResponse {
     let id: Int
     let htmlUrl: String
     let title: String
+    let number: Int
 }

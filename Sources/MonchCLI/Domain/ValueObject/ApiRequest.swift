@@ -10,7 +10,15 @@ import Foundation
 protocol ApiRequest: Encodable {
     associatedtype Response: ApiResponse
     var path: String { get }
+    var httpMethod: HTTPMethod { get }
     func makeURLRequest(baseUrl: String) -> URLRequest?
 }
 
 protocol ApiResponse: Decodable {}
+
+enum HTTPMethod: String {
+    case post   = "POST"
+    case get    = "GET"
+    case update = "UPDATE"
+    case delete = "DELETE"
+}

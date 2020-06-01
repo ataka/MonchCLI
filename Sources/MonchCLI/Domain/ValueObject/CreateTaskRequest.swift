@@ -47,6 +47,7 @@ struct CreateTaskRequest: ChatworkApiRequest {
     }
 
     var path: String { "rooms/\(roomId)/tasks" }
+    var httpMethod: HTTPMethod = .post
 }
 
 struct CreateTaskResponse: ChatworkApiResponse {

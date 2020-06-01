@@ -15,7 +15,7 @@ extension ChatworkApiRequest {
         guard let url = URL(string: "\(baseUrl)/\(path)") else { return nil }
 
         var request = URLRequest(url: url)
-        request.httpMethod = "POST"
+        request.httpMethod = httpMethod.rawValue
         request.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         do {
             request.httpBody = try XWWWFormUrlEncoder().encode(self)

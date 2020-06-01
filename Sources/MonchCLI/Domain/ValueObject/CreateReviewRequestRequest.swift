@@ -20,4 +20,5 @@ struct CreateReviewRequestRequest: GithubApiRequest {
     }
 
     var path: String { "pulls/\(pullRequestId)/requested_reviewers" }
+    var httpMethod: HTTPMethod = .post
 }

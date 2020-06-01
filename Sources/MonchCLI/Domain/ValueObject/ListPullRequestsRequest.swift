@@ -21,6 +21,7 @@ struct ListPullRequestsRequest: GithubApiRequest {
     }
 
     var path = "pulls"
+    var httpMethod: HTTPMethod = .get
 }
 
 extension Array: ApiResponse where Element == PullRequest {}

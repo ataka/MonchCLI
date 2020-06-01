@@ -20,6 +20,7 @@ struct CreateMessageRequest: ChatworkApiRequest {
     }
 
     var path: String { "rooms/\(roomId)/messages" }
+    var httpMethod: HTTPMethod = .post
 }
 
 struct CreateMessageResponse: ChatworkApiResponse {

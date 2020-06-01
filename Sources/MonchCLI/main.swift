@@ -41,14 +41,14 @@ func selectPullRequests(with config: Config, completionHandler: @escaping (PullR
 }
 
 func requestCodeReview(for pullRequest: PullRequest, with config: Config, completionHandler: @escaping () -> Void) {
-    let listRewiewers = config.reviewers
+    let listReviewers = config.reviewers
         .enumerated()
         .map { (offset, reviewer) in
             "[\(offset)] \(reviewer.name)"
         }
         .joined(separator: "\n")
 
-    print(listRewiewers)
+    print(listReviewers)
     print("\n> レビュワーを選んでください: ")
     guard let read = readLine() else { return }
 

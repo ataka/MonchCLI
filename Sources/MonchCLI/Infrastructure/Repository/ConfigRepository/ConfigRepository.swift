@@ -10,7 +10,7 @@ import Foundation
 struct ConfigRepository {
     func fetch() -> Config {
         do {
-            let fileName = "config.plist"
+            let fileName = ".monch.json"
             #if DEBUG
             let pathString: String = { (path: String) in
                 URL(fileURLWithPath: path)
@@ -24,7 +24,7 @@ struct ConfigRepository {
             let pathUrl = URL(fileURLWithPath: pathString)
 
             let data = try Data(contentsOf: pathUrl)
-            return try PropertyListDecoder().decode(Config.self, from: data)
+            return try JSONDecoder().decode(Config.self, from: data)
         } catch {
             fatalError(error.localizedDescription)
         }

@@ -24,7 +24,8 @@ struct ConfigRepository {
             let pathUrl = URL(fileURLWithPath: pathString)
 
             let data = try Data(contentsOf: pathUrl)
-            return try JSONDecoder().decode(Config.self, from: data)
+            let configFileObject = try JSONDecoder().decode(ConfigFileObject.self, from: data)
+            return Config(configFileObject: configFileObject)
         } catch {
             fatalError(error.localizedDescription)
         }

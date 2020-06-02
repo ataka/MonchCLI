@@ -7,21 +7,21 @@
 
 import Foundation
 
-struct Config: Decodable {
+struct Config {
     let chatwork: Chatwork
     let github: Github
     let reviewers: [Reviewer]
 }
 
 extension Config {
-    struct Chatwork: Decodable {
+    struct Chatwork {
         let token: String
         let roomId: Int
     }
 }
 
 extension Config {
-    struct Github: Decodable {
+    struct Github {
         let token: String
         let repository: String
     }

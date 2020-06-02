@@ -1,23 +1,5 @@
 import Foundation
 
-func getConfig() throws -> Config {
-    let fileName = "config.plist"
-    #if DEBUG
-    let pathString: String = { (path: String) in
-        URL(fileURLWithPath: path)
-            .pathComponents
-            .dropLast(3)
-            .joined(separator: "/") + "/\(fileName)"
-    }(#file)
-    #else
-    let pathString = FileManager.default.currentDirectoryPath + "/\(fileName)"
-    #endif
-    let pathUrl = URL(fileURLWithPath: pathString)
-
-    let data = try Data(contentsOf: pathUrl)
-    return try PropertyListDecoder().decode(Config.self, from: data)
-}
-
 func selectPullRequests(with config: Config, completionHandler: @escaping (PullRequest) -> Void) {
     let request = ListPullRequestsRequest()
     let githubClient = GithubClient(config: config.github)
@@ -107,13 +89,12 @@ func requestCodeReview(for pullRequest: PullRequest, with config: Config, comple
     }
 }
 
+enum Main {
+    static let filePath = #file
+}
+
 func main() {
-    let config: Config
-    do {
-        config = try getConfig()
-    } catch {
-        fatalError(error.localizedDescription)
-    }
+    let config = ConfigRepository().fetch()
     let semaphore = DispatchSemaphore(value: 0)
     selectPullRequests(with: config) { pullRequest in
         requestCodeReview(for: pullRequest, with: config) {

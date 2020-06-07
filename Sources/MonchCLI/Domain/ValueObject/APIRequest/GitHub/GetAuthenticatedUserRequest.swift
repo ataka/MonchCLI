@@ -7,13 +7,8 @@
 
 import Foundation
 
-struct GetAuthenticatedUserRequest: GithubApiRequest, Unencodable {
+struct GetAuthenticatedUserRequest: GithubApiUnencodableRequest {
     typealias Response = GitHubUser
-    let unencodable = true
-
-    private enum CodingKeys: CodingKey {
-        case unencodable
-    }
 
     var path = "user"
     var httpMethod: HTTPMethod = .get

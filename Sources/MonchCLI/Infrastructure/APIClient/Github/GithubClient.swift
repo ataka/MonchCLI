@@ -15,7 +15,7 @@ struct GithubClient {
         self.config = config
     }
 
-    func send<Request: GithubApiRequest>(_ request: Request, completionHandler: @escaping (_ response: Request.Response) -> Void) {
+    func send<Request: GithubApiBaseRequest>(_ request: Request, completionHandler: @escaping (_ response: Request.Response) -> Void) {
         guard var request = request.makeURLRequest(baseUrl: baseUrl) else { return }
         request.setValue(authorization, forHTTPHeaderField: "Authorization")
 

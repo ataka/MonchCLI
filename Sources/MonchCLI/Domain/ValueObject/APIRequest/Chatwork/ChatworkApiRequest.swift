@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol ChatworkApiRequest: ApiRequest {}
+protocol ChatworkApiRequest: ApiRequest & Encodable {}
 protocol ChatworkApiResponse: ApiResponse {}
 
 extension ChatworkApiRequest {

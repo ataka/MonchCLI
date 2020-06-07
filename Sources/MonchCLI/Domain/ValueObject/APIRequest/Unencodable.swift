@@ -7,6 +7,4 @@
 
 import Foundation
 
-protocol Unencodable {
-    var unencodable: Bool { get }
-}
+protocol Unencodable {}

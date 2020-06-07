@@ -11,12 +11,28 @@ struct Config {
     let chatwork: Chatwork
     let github: Github
     let reviewers: [Reviewer]
+
+    func isValid() -> Bool {
+        chatwork.isValid()
+            && github.isValid()
+            && reviewers.reduce(true) { $0 && $1.isValid() }
+    }
 }
 
 extension Config {
     struct Chatwork {
         let token: String
         let roomId: Int
+
+        func isValid() -> Bool {
+            guard !token.isEmpty else {
+                fatalError("Chatwork Token が空です。設定ファイルを確認してください。")
+            }
+            guard token.isAlphaNumeric else {
+                fatalError("Chatwork Token はアルファベットと数字の組み合わせです。設定ファイルを確認してください。")
+            }
+            return true
+        }
     }
 }
 
@@ -24,6 +40,16 @@ extension Config {
     struct Github {
         let token: String
         let repository: String
+
+        func isValid() -> Bool {
+            guard !token.isEmpty else {
+                fatalError("GitHub Token が空です。設定ファイルを確認してください。")
+            }
+            guard token.isAlphaNumeric else {
+                fatalError("GitHub Token はアルファベットと数字の組み合わせです。設定ファイルを確認してください。")
+            }
+            return true
+        }
     }
 }
 
@@ -32,5 +58,23 @@ extension Config {
         let name: String
         let chatworkId: Int
         let githubLogin: String
+
+        func isValid() -> Bool {
+            guard !name.isEmpty else {
+                fatalError("Reviewer の名前が空です。設定ファイルを確認してください。")
+            }
+            guard !githubLogin.isEmpty else {
+                fatalError("Reviewer の GitHub の名前が空です。設定ファイルを確認してください。")
+            }
+            return true
+        }
+    }
+}
+
+// MARK: - Validation Extension
+
+private extension String {
+    var isAlphaNumeric: Bool {
+        range(of: "[^[:alnum:]]", options: .regularExpression) == nil
     }
 }

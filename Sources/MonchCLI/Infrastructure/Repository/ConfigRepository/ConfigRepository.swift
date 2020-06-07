@@ -13,9 +13,7 @@ struct ConfigRepository {
             let configFileObject = try ConfigFileObject.paths
                 .lazy
                 .filter { FileManager.default.fileExists(atPath: $0) }
-                .map { URL(fileURLWithPath: $0) }
-                .map { try Data(contentsOf: $0) }
-                .map { try JSONDecoder().decode(ConfigFileObject.self, from: $0) }
+                .map { try ConfigFileObjectFactory.make(path: $0) }
                 .reduce(ConfigFileObject.empty) { $0.merging($1) }
 
             let config = Config(configFileObject: configFileObject)

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct GitHubUser: GithubApiResponse, Identifiable, Equatable {
+struct GitHubUser: GithubApiResponse, Identifiable, Equatable, Encodable {
     let id: Int
     let login: String
 

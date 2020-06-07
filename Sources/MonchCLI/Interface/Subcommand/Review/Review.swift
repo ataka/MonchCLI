@@ -51,10 +51,16 @@ extension Monch {
         }
 
         private func getAuthenticatedUser(client: GithubClient, completionHandler: @escaping (GitHubUser) -> Void) {
-            let request = GetAuthenticatedUserRequest()
-            client.send(request) { authUser in
-                completionHandler(authUser)
+            let repository = GitHubAuthUserRepository()
+            guard let authUser = repository.fetch() else {
+                let request = GetAuthenticatedUserRequest()
+                client.send(request) { authUser in
+                    repository.save(authUser)
+                    completionHandler(authUser)
+                }
+                return
             }
+            completionHandler(authUser)
         }
 
         private func requestCodeReview(for pullRequest: PullRequest, with config: Config, completionHandler: @escaping () -> Void) {

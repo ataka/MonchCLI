@@ -10,21 +10,14 @@ import Foundation
 struct ConfigRepository {
     func fetch() -> Config {
         do {
-            let fileName = ".monch.json"
-            #if DEBUG
-            let pathString: String = { (path: String) in
-                URL(fileURLWithPath: path)
-                    .pathComponents
-                    .dropLast(3)
-                    .joined(separator: "/") + "/\(fileName)"
-            }(Main.filePath)
-            #else
-            let pathString = FileManager.default.currentDirectoryPath + "/\(fileName)"
-            #endif
-            let pathUrl = URL(fileURLWithPath: pathString)
+            let configFileObject = try ConfigFileObject.paths
+                .lazy
+                .filter { FileManager.default.fileExists(atPath: $0) }
+                .map { URL(fileURLWithPath: $0) }
+                .map { try Data(contentsOf: $0) }
+                .map { try JSONDecoder().decode(ConfigFileObject.self, from: $0) }
+                .reduce(ConfigFileObject.empty) { $0.merging($1) }
 
-            let data = try Data(contentsOf: pathUrl)
-            let configFileObject = try JSONDecoder().decode(ConfigFileObject.self, from: data)
             let config = Config(configFileObject: configFileObject)
             guard config.isValid() else { fatalError("BANG") }
             return config

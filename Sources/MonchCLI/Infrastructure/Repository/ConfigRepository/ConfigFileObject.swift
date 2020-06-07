@@ -8,9 +8,41 @@
 import Foundation
 
 struct ConfigFileObject: Decodable {
+    private static let systemFileName = "monch.json"
+    private static let fileName = ".monch.json"
+
     let chatwork: ChatworkFileObject?
     let github: GithubFileObject?
     let reviewers: [Config.Reviewer]?
+
+    // MARK: Path
+
+    static var paths: [String] {
+        [
+            systemDirPath,
+            homeDirPath,
+            currentDirPath,
+        ].compactMap { $0 }
+    }
+
+    private static let systemDirPath = "/etc/\(systemFileName)"
+
+    private static var homeDirPath: String? {
+        guard let homeDir = ProcessInfo.processInfo.environment["HOME"] else { return nil }
+        return "\(homeDir)/\(fileName)"
+    }
+
+    private static var currentDirPath: String {
+        #if DEBUG
+        return URL(fileURLWithPath: Main.filePath)
+                .pathComponents
+                .dropLast(3)
+                .joined(separator: "/") + "/\(fileName)"
+        #else
+        return FileManager.default.currentDirectoryPath + "/\(fileName)"
+        #endif
+    }
+
     // MARK: Merge
 
     static var empty: Self {

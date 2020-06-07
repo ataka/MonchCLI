@@ -11,16 +11,47 @@ struct ConfigFileObject: Decodable {
     let chatwork: ChatworkFileObject?
     let github: GithubFileObject?
     let reviewers: [Config.Reviewer]?
+    // MARK: Merge
+
+    static var empty: Self {
+        ConfigFileObject(
+            chatwork: nil,
+            github: nil,
+            reviewers: []
+        )
+    }
+
+    func merging(_ other: Self) -> Self {
+        ConfigFileObject(
+            chatwork: chatwork?.merging(other.chatwork) ?? other.chatwork,
+            github: github?.merging(other.github) ?? other.github,
+            reviewers: [reviewers, other.reviewers].compactMap { $0 }.flatMap { $0 }
+        )
+    }
 }
 
 struct ChatworkFileObject: Decodable {
     let token: String?
     let roomId: Int?
+
+    func merging(_ other: Self?) -> Self {
+        ChatworkFileObject(
+            token: other?.token ?? token,
+            roomId: other?.roomId ?? roomId
+        )
+    }
 }
 
 struct GithubFileObject: Decodable {
     let token: String?
     let repository: String?
+
+    func merging(_ other: Self?) -> Self {
+        GithubFileObject(
+            token: other?.token ?? token,
+            repository: other?.repository ?? repository
+        )
+    }
 }
 
 extension Config {

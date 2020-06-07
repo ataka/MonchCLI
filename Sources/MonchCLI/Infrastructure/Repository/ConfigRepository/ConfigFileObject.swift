@@ -34,7 +34,7 @@ struct ConfigFileObject: Decodable {
 
     private static var currentDirPath: String {
         #if DEBUG
-        return URL(fileURLWithPath: Main.filePath)
+        return URL(fileURLWithPath: Monch.filePath)
                 .pathComponents
                 .dropLast(3)
                 .joined(separator: "/") + "/\(fileName)"

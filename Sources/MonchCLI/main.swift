@@ -1,4 +1,5 @@
 import Foundation
+import ArgumentParser
 
 func selectPullRequests(with config: Config, completionHandler: @escaping (PullRequest) -> Void) {
     let request = ListPullRequestsRequest()
@@ -89,21 +90,21 @@ func requestCodeReview(for pullRequest: PullRequest, with config: Config, comple
     }
 }
 
-enum Main {
+struct Monch: ParsableCommand {
     static let filePath = #file
-}
 
-func main() {
-    let config = ConfigRepository().fetch()
-    let semaphore = DispatchSemaphore(value: 0)
-    selectPullRequests(with: config) { pullRequest in
-        requestCodeReview(for: pullRequest, with: config) {
-            print("タスクを振りました。")
-            semaphore.signal()
+    mutating func run() throws {
+        let config = ConfigRepository().fetch()
+        let semaphore = DispatchSemaphore(value: 0)
+        selectPullRequests(with: config) { pullRequest in
+            requestCodeReview(for: pullRequest, with: config) {
+                print("タスクを振りました。")
+                semaphore.signal()
+            }
         }
+        semaphore.wait()
     }
-    semaphore.wait()
 }
 
-main()
+Monch.main()
 

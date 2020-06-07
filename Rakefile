@@ -10,7 +10,7 @@ end
 
 desc "Run MonchCLI"
 task :run => :build do
-  sh "swift run monch -k swift"
+  sh "swift run monch review"
 end
 
 desc "Compile release build of MonchCLI"

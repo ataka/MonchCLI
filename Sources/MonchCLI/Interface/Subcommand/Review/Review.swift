@@ -26,24 +26,34 @@ extension Monch {
         }
 
         private func selectPullRequests(with config: Config, completionHandler: @escaping (PullRequest) -> Void) {
-            let request = ListPullRequestsRequest()
             let githubClient = GithubClient(config: config.github)
-            githubClient.send(request) { pullRequests in
+            getAuthenticatedUser(client: githubClient) { authUser in
+                let request = ListPullRequestsRequest(config: config.github)
+                githubClient.send(request) { pullRequests in
                     let listPullRequest = pullRequests
-                    .prefix(8)
-                    .enumerated()
-                    .map({ (offset, pullRequest) in
-                        "[\(offset)] \(pullRequest.title)"
-                    })
-                    .joined(separator: "\n")
+                        .filter { $0.user == authUser }
+                        .prefix(8)
+                        .enumerated()
+                        .map { (offset, pullRequest) in
+                            "[\(offset)] \(pullRequest.title)"
+                        }
+                        .joined(separator: "\n")
 
-                print(listPullRequest)
-                print("\n> PR を番号で選択してください: ")
-                guard let read = readLine(),
-                    let index = Int(read) else { return }
+                        print(listPullRequest)
+                        print("\n> PR を番号で選択してください: ")
+                        guard let read = readLine(),
+                            let index = Int(read) else { return }
 
-                let pullRequest = pullRequests[index]
-                completionHandler(pullRequest)
+                        let pullRequest = pullRequests[index]
+                        completionHandler(pullRequest)
+                }
+            }
+        }
+
+        private func getAuthenticatedUser(client: GithubClient, completionHandler: @escaping (GitHubUser) -> Void) {
+            let request = GetAuthenticatedUserRequest()
+            client.send(request) { authUser in
+                completionHandler(authUser)
             }
         }
 
@@ -106,7 +116,11 @@ extension Monch {
             let request = CreateTaskRequest(roomId: config.chatwork.roomId, text: text, assigneeIds: assignees.map { $0.chatworkId}, limitType: .date, deadline: deadline)
             let chatworkClient = ChatworkClient(config: config.chatwork)
             chatworkClient.send(request) { taskResponse in
-                let request = CreateReviewRequestRequest(pullRequestId: pullRequest.number, reviewers: assignees.map { $0.githubLogin })
+                let request = CreateReviewRequestRequest(
+                    repository: config.github.repository,
+                    pullRequestId: pullRequest.number,
+                    reviewers: assignees.map { $0.githubLogin }
+                )
                 let githubClient = GithubClient(config: config.github)
                 githubClient.send(request) { pullRequest in
                     completionHandler()

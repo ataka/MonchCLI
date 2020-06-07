@@ -7,11 +7,11 @@
 
 import Foundation
 
-typealias GitHubUser = String
-
 struct CreateReviewRequestRequest: GithubApiRequest {
     typealias Response = PullRequest
+    typealias GitHubUser = String
 
+    let repository: String
     let pullRequestId: Int
     let reviewers: [GitHubUser]
 
@@ -19,6 +19,6 @@ struct CreateReviewRequestRequest: GithubApiRequest {
         case reviewers
     }
 
-    var path: String { "pulls/\(pullRequestId)/requested_reviewers" }
+    var path: String { "repos/\(repository)/pulls/\(pullRequestId)/requested_reviewers" }
     var httpMethod: HTTPMethod = .post
 }

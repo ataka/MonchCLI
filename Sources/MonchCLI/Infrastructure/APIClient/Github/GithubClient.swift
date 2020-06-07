@@ -8,13 +8,11 @@
 import Foundation
 
 struct GithubClient {
-    private static let rootUrl = "https://api.github.com"
-    private let baseUrl: String
+    private let baseUrl: String = "https://api.github.com"
     private let config: Config.Github
 
     init(config: Config.Github) {
         self.config = config
-        baseUrl = "\(Self.rootUrl)/repos/\(config.repository)"
     }
 
     func send<Request: GithubApiRequest>(_ request: Request, completionHandler: @escaping (_ response: Request.Response) -> Void) {

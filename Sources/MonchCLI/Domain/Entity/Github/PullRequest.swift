@@ -18,4 +18,5 @@ struct PullRequest: ApiResponse {
     let htmlUrl: String
     let title: String
     let number: Int
+    let user: GitHubUser
 }

@@ -27,4 +27,8 @@ struct GitHubAuthUserRepository {
             fatalError(error.localizedDescription)
         }
     }
+
+    func delete() {
+        UserDefaults.standard.removeObject(forKey: key)
+    }
 }

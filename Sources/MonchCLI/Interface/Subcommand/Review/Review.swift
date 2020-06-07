@@ -12,6 +12,9 @@ extension Monch {
     struct Review: ParsableCommand {
         static var configuration = CommandConfiguration(abstract: "PR のレビューを依頼する")
 
+        @Flag(name: [.long, .customShort("c")], help: "GitHub ユーザーのキャッシュをクリアします")
+        var clearCache: Bool
+
         mutating func run() {
             let config = ConfigRepository().fetch()
 
@@ -52,6 +55,10 @@ extension Monch {
 
         private func getAuthenticatedUser(client: GithubClient, completionHandler: @escaping (GitHubUser) -> Void) {
             let repository = GitHubAuthUserRepository()
+            if clearCache {
+                repository.delete()
+            }
+
             guard let authUser = repository.fetch() else {
                 let request = GetAuthenticatedUserRequest()
                 client.send(request) { authUser in

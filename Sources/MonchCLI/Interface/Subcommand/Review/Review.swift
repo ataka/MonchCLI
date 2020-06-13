@@ -36,22 +36,16 @@ extension Monch {
             getAuthenticatedUser(client: githubClient) { authUser in
                 let request = ListPullRequestsRequest(config: config.github)
                 githubClient.send(request) { pullRequests in
-                    let listPullRequest = pullRequests
+                    let selectedPullRequests = pullRequests
                         .filter(PullRequest.isListable(showsAll: self.showsAllPullRequests, authenticatedUser: authUser))
                         .prefix(8)
-                        .enumerated()
-                        .map { (offset, pullRequest) in
-                            "[\(offset)] \(pullRequest.title)"
-                        }
-                        .joined(separator: "\n")
 
-                        print(listPullRequest)
-                        print("\n> PR を番号で選択してください: ")
-                        guard let read = readLine(),
-                            let index = Int(read) else { return }
-
-                        let pullRequest = pullRequests[index]
-                        completionHandler(pullRequest)
+                    let pullRequest = SelectView<PullRequest>(
+                        message: "PR を番号で選択してください",
+                        items: selectedPullRequests,
+                        getTitleHandler: { $0.title }
+                    ).getItem()
+                    completionHandler(pullRequest)
                 }
             }
         }

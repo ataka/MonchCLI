@@ -9,9 +9,10 @@ import Foundation
 
 struct SelectView<T> {
     typealias Item = T
+    typealias GetTitleHandler = (_ item: Item) -> String
     private let message: String
     private let items: [Item]
-    private let getTitleHandler: (_ item: Item) -> String
+    private let getTitleHandler: GetTitleHandler
 
     init(message: String, items: [Item], getTitleHandler: @escaping (_ item: Item) -> String) {
         self.message = message
@@ -26,14 +27,7 @@ struct SelectView<T> {
     }
 
     func getItem() -> Item {
-        let itemList = items
-            .enumerated()
-            .map { (offset, item) in
-                "[\(offset)] \(getTitleHandler(item))"
-            }
-            .joined(separator: "\n")
-        print(itemList)
-
+        print(makeListText(items: items, getTitle: getTitleHandler))
         print("\n> \(message): \n? ", terminator: "")
         guard let input = readLine(),
             let index = Int(input) else {
@@ -41,5 +35,24 @@ struct SelectView<T> {
         }
 
         return items[index]
+    }
+
+    private func makeListText(items: [Item], getTitle: GetTitleHandler) -> String {
+        return items
+            .enumerated()
+            .map({ (offset, item) in
+                "[\(offset)] \(getTitle(item))"
+            })
+            .joined(separator: "\n")
+    }
+
+    func getItems() -> [Item] {
+        print(makeListText(items: items, getTitle: getTitleHandler))
+        print("\n> \(message): \n? ", terminator: "")
+        guard let input = readLine() else { fatalError() }
+
+        return input.split(separator: ",")
+            .compactMap { Int($0) }
+            .map { items[$0] }
     }
 }

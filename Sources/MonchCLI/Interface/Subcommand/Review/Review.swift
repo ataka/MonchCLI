@@ -68,17 +68,13 @@ extension Monch {
         }
 
         private func requestCodeReview(for pullRequest: PullRequest, with config: Config, completionHandler: @escaping () -> Void) {
-            let listReviewers = config.reviewers
+            let selectedReviewers = config.reviewers
                 .filter(Reviewer.isReviewable(with: pullRequest))
-                .enumerated()
-                .map { (offset, reviewer) in
-                    "[\(offset)] \(reviewer.name)"
-                }
-                .joined(separator: "\n")
-
-            print(listReviewers)
-            print("\n> レビュワーを選んでください: ")
-            guard let read = readLine() else { return }
+            let reviewers = SelectView<Reviewer>(
+                message: "レビュワーを選んでください",
+                items: selectedReviewers,
+                getTitleHandler: { $0.name }
+            ).getItems()
 
             let text = """
             \(pullRequest.title)
@@ -117,20 +113,14 @@ extension Monch {
             }
             guard let deadline = Calendar.current.date(byAdding: dateComponent, to: Date()) else { return }
 
-            let assignees = read
-                .split(separator: ",")
-                .map(String.init)
-                .compactMap(Int.init)
-                .map { config.reviewers[$0] }
-
             //        let request = CreateMessageRequest(roomId: config.chatwork.roomId, text: "Hello, This is MonchCLI!")
-            let request = CreateTaskRequest(roomId: config.chatwork.roomId, text: text, assigneeIds: assignees.map { $0.chatworkId}, limitType: .date, deadline: deadline)
+            let request = CreateTaskRequest(roomId: config.chatwork.roomId, text: text, assigneeIds: reviewers.map { $0.chatworkId}, limitType: .date, deadline: deadline)
             let chatworkClient = ChatworkClient(config: config.chatwork)
             chatworkClient.send(request) { taskResponse in
                 let request = CreateReviewRequestRequest(
                     repository: config.github.repository,
                     pullRequestId: pullRequest.number,
-                    reviewers: assignees.map { $0.githubLogin }
+                    reviewers: reviewers.map { $0.githubLogin }
                 )
                 let githubClient = GithubClient(config: config.github)
                 githubClient.send(request) { pullRequest in

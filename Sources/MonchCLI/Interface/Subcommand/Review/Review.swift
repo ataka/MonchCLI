@@ -74,8 +74,9 @@ extension Monch {
         }
 
         private func requestCodeReview(for pullRequest: PullRequest, with config: Config, completionHandler: @escaping () -> Void) {
-            let listReviewers = config.reviewers
+            let selectedReviewers = config.reviewers
                 .filter(Reviewer.isReviewable(with: pullRequest))
+            let listReviewers = selectedReviewers
                 .enumerated()
                 .map { (offset, reviewer) in
                     "[\(offset)] \(reviewer.name)"
@@ -127,7 +128,7 @@ extension Monch {
                 .split(separator: ",")
                 .map(String.init)
                 .compactMap(Int.init)
-                .map { config.reviewers[$0] }
+                .map { selectedReviewers[$0] }
 
             //        let request = CreateMessageRequest(roomId: config.chatwork.roomId, text: "Hello, This is MonchCLI!")
             let request = CreateTaskRequest(roomId: config.chatwork.roomId, text: text, assigneeIds: assignees.map { $0.chatworkId}, limitType: .date, deadline: deadline)

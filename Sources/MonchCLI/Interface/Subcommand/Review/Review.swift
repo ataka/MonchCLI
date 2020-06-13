@@ -15,7 +15,7 @@ extension Monch {
         @Flag(name: [.long, .customShort("c")], help: "GitHub ユーザーのキャッシュをクリアします")
         var clearCache: Bool
 
-        @Flag(name: [.long, .customShort("s")], help: "すべての PR を表示します")
+        @Flag(name: [.long, .customShort("a")], help: "すべての PR を表示します")
         var showsAllPullRequests: Bool
 
         mutating func run() {

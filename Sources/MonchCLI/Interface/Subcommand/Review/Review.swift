@@ -83,19 +83,21 @@ extension Monch {
             レビューをお願いします (please)
             """
 
-            let listDeadline = """
-            [0] 急いでいます。今日中で!!
-            [1] 時間のある時にやって欲しいです。二営業日以内!
-            [2] 急いでいません。でも忘れてもらっては困ります。二週間以内に。
-            """
-            print(listDeadline)
-            print("\n> しめ切りを設定してください: ")
-            guard let readDeadline = readLine() else { return }
+            let deadlineItems = [
+                "急いでいます。今日中で!!",
+                "時間のある時にやって欲しいです。二営業日以内!",
+                "急いでいません。でも忘れてもらっては困ります。二週間以内に。",
+            ]
+            let deadlineIndex = SelectView<String>(
+                message: "しめ切りを設定してください",
+                items: deadlineItems,
+                getTitleHandler: { $0 }
+            ).getIndex()
             var dateComponent = DateComponents()
-            switch readDeadline {
-            case "0":
+            switch deadlineIndex {
+            case 0:
                 dateComponent.hour = 2
-            case "1":
+            case 1:
                 switch Calendar.current.dateComponents([.weekday], from: Date()).weekday {
                 case 1, 2, 3, 4: // Sunday, Monday, Tuesday, Wednesday
                     dateComponent.day = 2
@@ -106,7 +108,7 @@ extension Monch {
                 default:
                     fatalError("NO DAY of WEEK")
                 }
-            case "2":
+            case 2:
                 dateComponent.day = 14
             default:
                 fatalError("No DEADLINE")

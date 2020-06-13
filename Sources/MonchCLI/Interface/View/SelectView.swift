@@ -55,4 +55,15 @@ struct SelectView<T> {
             .compactMap { Int($0) }
             .map { items[$0] }
     }
+
+    func getIndex() -> Int {
+        print(makeListText(items: items, getTitle: getTitleHandler))
+        print("\n> \(message): \n? ", terminator: "")
+        guard let input = readLine(),
+            let index = Int(input) else {
+                fatalError()
+        }
+
+        return index
+    }
 }

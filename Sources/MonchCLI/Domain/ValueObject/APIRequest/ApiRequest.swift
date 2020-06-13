@@ -7,7 +7,7 @@
 
 import Foundation
 
-protocol ApiRequest: Encodable {
+protocol ApiRequest {
     associatedtype Response: ApiResponse
     var path: String { get }
     var httpMethod: HTTPMethod { get }

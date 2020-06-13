@@ -18,4 +18,17 @@ struct PullRequest: ApiResponse {
     let htmlUrl: String
     let title: String
     let number: Int
+    let user: GitHubUser
+
+    // MARK: - Domain Logic
+
+    typealias FilterClosure = (_ pullRequest: Self) -> Bool
+
+    static func isListable(showsAll: Bool, authenticatedUser: GitHubUser) -> FilterClosure {
+        if showsAll {
+            return { _ in true }
+        } else {
+            return { $0.user == authenticatedUser }
+        }
+    }
 }

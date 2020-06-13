@@ -12,6 +12,8 @@ struct Reviewer: Decodable {
     let chatworkId: Int
     let githubLogin: String
 
+    // MARK: - Domain Logic
+
     func isValid() -> Bool {
         guard !name.isEmpty else {
             fatalError("Reviewer の名前が空です。設定ファイルを確認してください。")
@@ -20,5 +22,13 @@ struct Reviewer: Decodable {
             fatalError("Reviewer の GitHub の名前が空です。設定ファイルを確認してください。")
         }
         return true
+    }
+
+    typealias FilterClosure = (_ reviewer: Self) -> Bool
+
+    static func isReviewable(with pullRequest: PullRequest) -> FilterClosure {
+        return {
+            $0.githubLogin != pullRequest.user.login
+        }
     }
 }

@@ -9,11 +9,10 @@ import Foundation
 
 struct CreateReviewRequestRequest: GithubApiRequest {
     typealias Response = PullRequest
-    typealias GitHubUser = String
 
     let repository: String
     let pullRequestId: Int
-    let reviewers: [GitHubUser]
+    let reviewers: [GitHubLogin]
 
     private enum CodingKeys: String, CodingKey {
         case reviewers

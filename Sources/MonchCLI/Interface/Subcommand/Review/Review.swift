@@ -75,6 +75,7 @@ extension Monch {
 
         private func requestCodeReview(for pullRequest: PullRequest, with config: Config, completionHandler: @escaping () -> Void) {
             let listReviewers = config.reviewers
+                .filter(Reviewer.isReviewable(with: pullRequest))
                 .enumerated()
                 .map { (offset, reviewer) in
                     "[\(offset)] \(reviewer.name)"

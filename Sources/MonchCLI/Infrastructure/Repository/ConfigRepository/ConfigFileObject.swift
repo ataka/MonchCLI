@@ -13,7 +13,7 @@ struct ConfigFileObject: Decodable {
 
     let chatwork: ChatworkFileObject?
     let github: GithubFileObject?
-    let reviewers: [Config.Reviewer]?
+    let reviewers: [Reviewer]?
 
     // MARK: Path
 

@@ -9,7 +9,7 @@ import Foundation
 
 struct GitHubUser: GithubApiResponse, Identifiable, Equatable, Encodable {
     let id: Int
-    let login: String
+    let login: GitHubLogin
 
     static func == (lhs: Self, rhs: Self) -> Bool {
         lhs.id == rhs.id

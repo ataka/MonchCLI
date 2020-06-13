@@ -83,40 +83,15 @@ extension Monch {
             レビューをお願いします (please)
             """
 
-            let deadlineItems = [
-                "急いでいます。今日中で!!",
-                "時間のある時にやって欲しいです。二営業日以内!",
-                "急いでいません。でも忘れてもらっては困ります。二週間以内に。",
-            ]
-            let deadlineIndex = SelectView<String>(
+            let deadline = SelectView<Deadline>(
                 message: "しめ切りを設定してください",
-                items: deadlineItems,
-                getTitleHandler: { $0 }
-            ).getIndex()
-            var dateComponent = DateComponents()
-            switch deadlineIndex {
-            case 0:
-                dateComponent.hour = 2
-            case 1:
-                switch Calendar.current.dateComponents([.weekday], from: Date()).weekday {
-                case 1, 2, 3, 4: // Sunday, Monday, Tuesday, Wednesday
-                    dateComponent.day = 2
-                case 5, 6: // Thursday, Friday
-                    dateComponent.day = 4
-                case 7: // Saturday
-                    dateComponent.day = 3
-                default:
-                    fatalError("NO DAY of WEEK")
-                }
-            case 2:
-                dateComponent.day = 14
-            default:
-                fatalError("No DEADLINE")
-            }
-            guard let deadline = Calendar.current.date(byAdding: dateComponent, to: Date()) else { return }
+                items: Deadline.allCases,
+                getTitleHandler: { $0.string }
+            ).getItem()
+            guard let deadlineDate = deadline.getDate() else { return }
 
             //        let request = CreateMessageRequest(roomId: config.chatwork.roomId, text: "Hello, This is MonchCLI!")
-            let request = CreateTaskRequest(roomId: config.chatwork.roomId, text: text, assigneeIds: reviewers.map { $0.chatworkId}, limitType: .date, deadline: deadline)
+            let request = CreateTaskRequest(roomId: config.chatwork.roomId, text: text, assigneeIds: reviewers.map { $0.chatworkId}, limitType: .date, deadline: deadlineDate)
             let chatworkClient = ChatworkClient(config: config.chatwork)
             chatworkClient.send(request) { taskResponse in
                 let request = CreateReviewRequestRequest(

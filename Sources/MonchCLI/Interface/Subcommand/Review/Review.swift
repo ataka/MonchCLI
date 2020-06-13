@@ -36,15 +36,8 @@ extension Monch {
             getAuthenticatedUser(client: githubClient) { authUser in
                 let request = ListPullRequestsRequest(config: config.github)
                 githubClient.send(request) { pullRequests in
-                    let filterPR: (PullRequest) -> Bool = { showsAll, authUser in
-                        if showsAll {
-                            return { _ in true }
-                        } else {
-                            return { $0.user == authUser }
-                        }
-                    }(self.showsAllPullRequests, authUser)
                     let listPullRequest = pullRequests
-                        .filter(filterPR)
+                        .filter(PullRequest.isListable(showsAll: self.showsAllPullRequests, authenticatedUser: authUser))
                         .prefix(8)
                         .enumerated()
                         .map { (offset, pullRequest) in

@@ -15,6 +15,9 @@ extension Monch {
         @Flag(name: [.long, .customShort("c")], help: "GitHub ユーザーのキャッシュをクリアします")
         var clearCache: Bool
 
+        @Flag(name: [.long, .customShort("s")], help: "すべての PR を表示します")
+        var showsAllPullRequests: Bool
+
         mutating func run() {
             let config = ConfigRepository().fetch()
 
@@ -33,8 +36,15 @@ extension Monch {
             getAuthenticatedUser(client: githubClient) { authUser in
                 let request = ListPullRequestsRequest(config: config.github)
                 githubClient.send(request) { pullRequests in
+                    let filterPR: (PullRequest) -> Bool = { showsAll, authUser in
+                        if showsAll {
+                            return { _ in true }
+                        } else {
+                            return { $0.user == authUser }
+                        }
+                    }(self.showsAllPullRequests, authUser)
                     let listPullRequest = pullRequests
-                        .filter { $0.user == authUser }
+                        .filter(filterPR)
                         .prefix(8)
                         .enumerated()
                         .map { (offset, pullRequest) in

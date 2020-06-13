@@ -8,10 +8,13 @@ let package = Package(
     products: [
         .executable(name: "monch", targets: ["MonchCLI"])
     ],
+    dependencies: [
+        .package(url: "https://github.com/apple/swift-argument-parser.git", from: "0.1.0"),
+    ],
     targets: [
         .target(
             name: "MonchCLI",
-            dependencies: []),
+            dependencies: [.product(name: "ArgumentParser", package: "swift-argument-parser")]),
         .testTarget(
             name: "MonchCLITests",
             dependencies: ["MonchCLI"]),

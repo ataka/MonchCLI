@@ -10,7 +10,7 @@ end
 
 desc "Run MonchCLI"
 task :run => :build do
-  sh "swift run monch -k swift"
+  sh "swift run monch review"
 end
 
 desc "Compile release build of MonchCLI"
@@ -23,5 +23,5 @@ PREFIX = "/usr/local"
 desc "Install MonchCLI"
 task :install => :compile do
   sh "mkdir -p #{PREFIX}/bin"
-  sh "cp -p ./build/release/monch #{PREFIX}/bin"
+  sh "sudo cp -p ./.build/release/monch #{PREFIX}/bin"
 end

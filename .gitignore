@@ -91,3 +91,9 @@ iOSInjectionProject/
 
 # Emacs
 *~
+
+# MonchCLI
+.monch.json
+
+# Mac
+.DS_Store

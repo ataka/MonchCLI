@@ -24,9 +24,12 @@ struct SelectView<T> {
     func getItem() -> Item {
         print(makeListText(items: items, getTitle: getTitleHandler))
         print("\n> \(message): \n? ", terminator: "")
-        guard let input = readLine(),
-            let indexInt = Int(input) else {
-            fatalError()
+        var indexInt: Int
+        do {
+            indexInt = try readInt(for: items)
+        } catch {
+            print(error.localizedDescription)
+            return getItem()
         }
         let index = AnyIndex(indexInt)
 
@@ -42,6 +45,14 @@ struct SelectView<T> {
             .joined(separator: "\n")
     }
 
+    private func readInt(for items: Items) throws -> Int {
+        guard let input = readLine() else { throw ReadIntError.readLineFailure }
+        guard let index = Int(input) else { throw ReadIntError.notInteger }
+        guard index >= 0             else { throw ReadIntError.negativeNumber }
+        guard index < items.count    else { throw ReadIntError.tooLargeNumber }
+        return index
+    }
+
     func getItems() -> [Item] {
         print(makeListText(items: items, getTitle: getTitleHandler))
         print("\n> \(message): \n? ", terminator: "")
@@ -52,5 +63,25 @@ struct SelectView<T> {
             .compactMap(Int.init)
             .map(AnyIndex.init)
             .map { items[$0] }
+    }
+}
+
+enum ReadIntError: Error {
+    case readLineFailure
+    case notInteger
+    case negativeNumber
+    case tooLargeNumber
+
+    var localizedDescription: String {
+        switch self {
+        case .readLineFailure:
+            return "読み込みに失敗しました。"
+        case .notInteger:
+            return "数字を入力してください。"
+        case .negativeNumber:
+            return "マイナス値が入力されたようです。ゼロ以上の数を入力してください。"
+        case .tooLargeNumber:
+            return "数が大きすぎるようです。リスト番号を入力してください。"
+        }
     }
 }

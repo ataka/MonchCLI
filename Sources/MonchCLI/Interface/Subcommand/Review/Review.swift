@@ -36,9 +36,10 @@ extension Monch {
             getAuthenticatedUser(client: githubClient) { authUser in
                 let request = ListPullRequestsRequest(config: config.github)
                 githubClient.send(request) { pullRequests in
-                    let listPullRequest = pullRequests
+                    let filtered = pullRequests
                         .filter(PullRequest.isListable(showsAll: self.showsAllPullRequests, authenticatedUser: authUser))
                         .prefix(8)
+                    let listPullRequest = filtered
                         .enumerated()
                         .map { (offset, pullRequest) in
                             "[\(offset)] \(pullRequest.title)"
@@ -50,7 +51,7 @@ extension Monch {
                         guard let read = readLine(),
                             let index = Int(read) else { return }
 
-                        let pullRequest = pullRequests[index]
+                        let pullRequest = filtered[index]
                         completionHandler(pullRequest)
                 }
             }

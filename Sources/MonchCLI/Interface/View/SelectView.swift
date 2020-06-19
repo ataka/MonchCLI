@@ -63,7 +63,7 @@ struct SelectView<T> {
 
     func getItems() -> [Item] {
         func getItems(from items: Items, with message: String) -> [Item] {
-            print("\n> \(message): \n? ", terminator: "")
+            print("\n> \(message): (カンマ区切りで複数選択可)\n? ", terminator: "")
 
             let indexesInt: [Int]
             do {

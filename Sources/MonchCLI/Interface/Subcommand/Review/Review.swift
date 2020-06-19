@@ -36,12 +36,12 @@ extension Monch {
             getAuthenticatedUser(client: githubClient) { authUser in
                 let request = ListPullRequestsRequest(config: config.github)
                 githubClient.send(request) { pullRequests in
-                    let selectedPullRequests = pullRequests
+                    let filteredPullRequests = pullRequests
                         .filter(PullRequest.isListable(showsAll: self.showsAllPullRequests, authenticatedUser: authUser))
                         .prefix(8)
 
                     let pullRequest = SelectView<PullRequest>(message: "PR を番号で選択してください",
-                                                              items: selectedPullRequests,
+                                                              items: filteredPullRequests,
                                                               getTitleHandler: \.title).getItem()
                     completionHandler(pullRequest)
                 }
@@ -66,10 +66,10 @@ extension Monch {
         }
 
         private func requestCodeReview(for pullRequest: PullRequest, with config: Config, completionHandler: @escaping () -> Void) {
-            let selectedReviewers = config.reviewers
+            let filteredReviewers = config.reviewers
                 .filter(Reviewer.isReviewable(with: pullRequest))
             let reviewers = SelectView<Reviewer>(message: "レビュワーを選んでください",
-                                                 items: selectedReviewers,
+                                                 items: filteredReviewers,
                                                  getTitleHandler: \.name).getItems()
 
             let text = """

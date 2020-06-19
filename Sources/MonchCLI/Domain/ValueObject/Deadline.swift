@@ -23,13 +23,13 @@ enum Deadline: Int, CaseIterable {
         }
     }
 
-    func getDate() -> Date? {
+    func getDate(_ now: Date = Date()) -> Date? {
         var adding = DateComponents()
         switch self {
         case .today:
             adding.hour = 2
         case .aFewDaysLater:
-            switch Calendar.current.dateComponents([.weekday], from: Date()).weekday {
+            switch Calendar.current.dateComponents([.weekday], from: now).weekday {
             case 1, 2, 3, 4: // Sunday, Monday, Tuesday, Wednesday
                 adding.day = 2
             case 5, 6: // Thursday, Friday
@@ -42,6 +42,6 @@ enum Deadline: Int, CaseIterable {
         case .twoWeeksLater:
             adding.day = 14
         }
-        return Calendar.current.date(byAdding: adding, to: Date())
+        return Calendar.current.date(byAdding: adding, to: now)
     }
 }

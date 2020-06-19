@@ -54,10 +54,11 @@ struct SelectView<T> {
     }
 
     private func readInt(for items: Items) throws -> Int {
-        guard let input = readLine() else { throw ReadIntError.readLineFailure }
-        guard let index = Int(input) else { throw ReadIntError.notInteger }
-        guard index >= 0             else { throw ReadIntError.negativeNumber }
-        guard index < items.count    else { throw ReadIntError.tooLargeNumber }
+        guard let input = readLine()   else { throw ReadIntError.readLineFailure }
+        let trimmed = input.trimmingCharacters(in: .whitespaces)
+        guard let index = Int(trimmed) else { throw ReadIntError.notInteger }
+        guard index >= 0               else { throw ReadIntError.negativeNumber }
+        guard index < items.count      else { throw ReadIntError.tooLargeNumber }
         return index
     }
 
@@ -89,6 +90,7 @@ struct SelectView<T> {
         guard let input = readLine() else { throw ReadIntError.readLineFailure }
         return try input.split(separator: ",")
             .map(String.init)
+            .map({ $0.trimmingCharacters(in: .whitespaces) })
             .map({
                 guard let index = Int($0) else { throw ReadIntError.notInteger }
                 guard index >= 0          else { throw ReadIntError.negativeNumber }

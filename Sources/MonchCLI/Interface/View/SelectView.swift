@@ -22,18 +22,26 @@ struct SelectView<T> {
     }
 
     func getItem() -> Item {
-        print(makeListText(items: items, getTitle: getTitleHandler))
-        print("\n> \(message): \n? ", terminator: "")
-        var indexInt: Int
-        do {
-            indexInt = try readInt(for: items)
-        } catch {
-            print(error.localizedDescription)
-            return getItem()
-        }
-        let index = AnyIndex(indexInt)
+        func getItemInner() -> Item {
+            print("\n> \(message): \n? ", terminator: "")
 
-        return items[index]
+            var indexInt: Int
+            do {
+                indexInt = try readInt(for: items)
+            } catch let error as ReadIntError {
+                print(error.localizedDescription)
+                return getItemInner()
+            } catch {
+                print(error.localizedDescription)
+                fatalError("Unknown error!")
+            }
+            let index = AnyIndex(indexInt)
+
+            return items[index]
+        }
+
+        print(makeListText(items: items, getTitle: getTitleHandler))
+        return getItemInner()
     }
 
     private func makeListText(items: Items, getTitle: GetTitleHandler) -> String {

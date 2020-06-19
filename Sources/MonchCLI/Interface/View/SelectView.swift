@@ -22,15 +22,15 @@ struct SelectView<T> {
     }
 
     func getItem() -> Item {
-        func getItemInner() -> Item {
+        func getItem(from items: Items, with message: String) -> Item {
             print("\n> \(message): \n? ", terminator: "")
 
-            var indexInt: Int
+            let indexInt: Int
             do {
                 indexInt = try readInt(for: items)
             } catch let error as ReadIntError {
                 print(error.localizedDescription)
-                return getItemInner()
+                return getItem(from: items, with: message)
             } catch {
                 print(error.localizedDescription)
                 fatalError("Unknown error!")
@@ -41,7 +41,7 @@ struct SelectView<T> {
         }
 
         print(makeListText(items: items, getTitle: getTitleHandler))
-        return getItemInner()
+        return getItem(from: items, with: message)
     }
 
     private func makeListText(items: Items, getTitle: GetTitleHandler) -> String {
@@ -62,15 +62,39 @@ struct SelectView<T> {
     }
 
     func getItems() -> [Item] {
-        print(makeListText(items: items, getTitle: getTitleHandler))
-        print("\n> \(message): \n? ", terminator: "")
-        guard let input = readLine() else { fatalError() }
+        func getItems(from items: Items, with message: String) -> [Item] {
+            print("\n> \(message): \n? ", terminator: "")
 
-        return input.split(separator: ",")
+            let indexesInt: [Int]
+            do {
+                indexesInt = try readInts(for: items)
+            } catch let error as ReadIntError {
+                print(error.localizedDescription)
+                return getItems(from: items, with: message)
+            } catch {
+                print(error.localizedDescription)
+                fatalError("Unknown error!")
+            }
+
+            return indexesInt
+                .map(AnyIndex.init)
+                .map { items[$0] }
+        }
+
+        print(makeListText(items: items, getTitle: getTitleHandler))
+        return getItems(from: items, with: message)
+    }
+
+    private func readInts(for items: Items) throws -> [Int] {
+        guard let input = readLine() else { throw ReadIntError.readLineFailure }
+        return try input.split(separator: ",")
             .map(String.init)
-            .compactMap(Int.init)
-            .map(AnyIndex.init)
-            .map { items[$0] }
+            .map({
+                guard let index = Int($0) else { throw ReadIntError.notInteger }
+                guard index >= 0          else { throw ReadIntError.negativeNumber }
+                guard index < items.count else { throw ReadIntError.tooLargeNumber }
+                return index
+            })
     }
 }
 

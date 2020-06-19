@@ -42,7 +42,7 @@ extension Monch {
 
                     let pullRequest = SelectView<PullRequest>(message: "PR を番号で選択してください",
                                                               items: selectedPullRequests,
-                                                              getTitleHandler: { $0.title }).getItem()
+                                                              getTitleHandler: \.title).getItem()
                     completionHandler(pullRequest)
                 }
             }
@@ -70,7 +70,7 @@ extension Monch {
                 .filter(Reviewer.isReviewable(with: pullRequest))
             let reviewers = SelectView<Reviewer>(message: "レビュワーを選んでください",
                                                  items: selectedReviewers,
-                                                 getTitleHandler: { $0.name }).getItems()
+                                                 getTitleHandler: \.name).getItems()
 
             let text = """
             \(pullRequest.title)
@@ -81,7 +81,7 @@ extension Monch {
 
             let deadline = SelectView<Deadline>(message: "しめ切りを設定してください",
                                                 items: Deadline.allCases,
-                                                getTitleHandler: { $0.string }).getItem()
+                                                getTitleHandler: \.string).getItem()
             guard let deadlineDate = deadline.getDate() else { return }
 
             //        let request = CreateMessageRequest(roomId: config.chatwork.roomId, text: "Hello, This is MonchCLI!")

@@ -57,8 +57,19 @@ struct ConfigFileObject: Decodable {
         ConfigFileObject(
             chatwork: chatwork?.merging(other.chatwork) ?? other.chatwork,
             github: github?.merging(other.github) ?? other.github,
-            reviewers: [reviewers, other.reviewers].compactMap { $0 }.flatMap { $0 }
+            reviewers: (reviewers ?? []).merging(other.reviewers)
         )
+    }
+}
+
+private extension Array where Element == Reviewer {
+    func merging(_ others: [Reviewer]?) -> [Reviewer] {
+        guard let others = others else { return self }
+        let sets = Set(self)
+        return others.reduce(into: self) {
+            guard !sets.contains($1) else { return }
+            $0.append($1)
+        }
     }
 }
 

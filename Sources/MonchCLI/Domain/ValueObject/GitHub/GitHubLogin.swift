@@ -7,6 +7,6 @@
 
 import Foundation
 
-struct GitHubLogin: RawRepresentable, Equatable, Codable {
+struct GitHubLogin: RawRepresentable, Hashable, Codable {
     let rawValue: String
 }

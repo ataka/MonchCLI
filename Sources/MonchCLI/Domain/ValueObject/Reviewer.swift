@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Reviewer: Decodable {
+struct Reviewer: Hashable, Decodable {
     let name: String
     let chatworkId: Int
     let githubLogin: GitHubLogin

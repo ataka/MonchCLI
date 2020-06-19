@@ -22,6 +22,6 @@ PREFIX = "/usr/local"
 
 desc "Install MonchCLI"
 task :install => :compile do
-  sh "mkdir -p #{PREFIX}/bin"
+  sh "sudo mkdir -p #{PREFIX}/bin"
   sh "sudo cp -p ./.build/release/monch #{PREFIX}/bin"
 end

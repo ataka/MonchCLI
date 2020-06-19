@@ -85,13 +85,13 @@ extension Monch {
             guard let deadlineDate = deadline.getDate() else { return }
 
             //        let request = CreateMessageRequest(roomId: config.chatwork.roomId, text: "Hello, This is MonchCLI!")
-            let request = CreateTaskRequest(roomId: config.chatwork.roomId, text: text, assigneeIds: reviewers.map { $0.chatworkId}, limitType: .date, deadline: deadlineDate)
+            let request = CreateTaskRequest(roomId: config.chatwork.roomId, text: text, assigneeIds: reviewers.map(\.chatworkId), limitType: .date, deadline: deadlineDate)
             let chatworkClient = ChatworkClient(config: config.chatwork)
             chatworkClient.send(request) { taskResponse in
                 let request = CreateReviewRequestRequest(
                     repository: config.github.repository,
                     pullRequestId: pullRequest.number,
-                    reviewers: reviewers.map { $0.githubLogin }
+                    reviewers: reviewers.map(\.githubLogin)
                 )
                 let githubClient = GithubClient(config: config.github)
                 githubClient.send(request) { pullRequest in

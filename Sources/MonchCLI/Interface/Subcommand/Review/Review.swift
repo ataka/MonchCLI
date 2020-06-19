@@ -40,11 +40,9 @@ extension Monch {
                         .filter(PullRequest.isListable(showsAll: self.showsAllPullRequests, authenticatedUser: authUser))
                         .prefix(8)
 
-                    let pullRequest = SelectView<PullRequest>(
-                        message: "PR を番号で選択してください",
-                        items: selectedPullRequests,
-                        getTitleHandler: { $0.title }
-                    ).getItem()
+                    let pullRequest = SelectView<PullRequest>(message: "PR を番号で選択してください",
+                                                              items: selectedPullRequests,
+                                                              getTitleHandler: { $0.title }).getItem()
                     completionHandler(pullRequest)
                 }
             }
@@ -70,11 +68,9 @@ extension Monch {
         private func requestCodeReview(for pullRequest: PullRequest, with config: Config, completionHandler: @escaping () -> Void) {
             let selectedReviewers = config.reviewers
                 .filter(Reviewer.isReviewable(with: pullRequest))
-            let reviewers = SelectView<Reviewer>(
-                message: "レビュワーを選んでください",
-                items: selectedReviewers,
-                getTitleHandler: { $0.name }
-            ).getItems()
+            let reviewers = SelectView<Reviewer>(message: "レビュワーを選んでください",
+                                                 items: selectedReviewers,
+                                                 getTitleHandler: { $0.name }).getItems()
 
             let text = """
             \(pullRequest.title)
@@ -83,11 +79,9 @@ extension Monch {
             レビューをお願いします (please)
             """
 
-            let deadline = SelectView<Deadline>(
-                message: "しめ切りを設定してください",
-                items: Deadline.allCases,
-                getTitleHandler: { $0.string }
-            ).getItem()
+            let deadline = SelectView<Deadline>(message: "しめ切りを設定してください",
+                                                items: Deadline.allCases,
+                                                getTitleHandler: { $0.string }).getItem()
             guard let deadlineDate = deadline.getDate() else { return }
 
             //        let request = CreateMessageRequest(roomId: config.chatwork.roomId, text: "Hello, This is MonchCLI!")

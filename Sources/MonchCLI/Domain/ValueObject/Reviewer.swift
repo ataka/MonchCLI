@@ -14,14 +14,10 @@ struct Reviewer: Hashable, Decodable {
 
     // MARK: - Domain Logic
 
-    func isValid() -> Bool {
-        guard !name.isEmpty else {
-            fatalError("Reviewer の名前が空です。設定ファイルを確認してください。")
-        }
-        guard !githubLogin.isEmpty else {
-            fatalError("Reviewer の GitHub の名前が空です。設定ファイルを確認してください。")
-        }
-        return true
+    func validate() throws {
+        guard !name.isEmpty        else { throw(ConfigFileError.reviewerNameEmpty) }
+        guard !githubLogin.isEmpty else { throw(ConfigFileError.reviewerGitHubLoginEmpty) }
+        return
     }
 
     typealias FilterClosure = (_ reviewer: Self) -> Bool

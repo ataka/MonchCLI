@@ -17,7 +17,7 @@ struct ConfigRepository {
                 .reduce(ConfigFileObject.empty) { $0.merging($1) }
 
             let config = try Config(configFileObject: configFileObject)
-            guard config.isValid() else { fatalError("BANG") }
+            try config.validate()
             return config
         } catch let error as ConfigFileError {
             print(error.localizedDescription)

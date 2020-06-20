@@ -16,9 +16,12 @@ struct ConfigRepository {
                 .map { try ConfigFileObjectFactory.make(path: $0) }
                 .reduce(ConfigFileObject.empty) { $0.merging($1) }
 
-            let config = Config(configFileObject: configFileObject)
+            let config = try Config(configFileObject: configFileObject)
             guard config.isValid() else { fatalError("BANG") }
             return config
+        } catch let error as ConfigFileError {
+            print(error.localizedDescription)
+            exit(.invalidConfigFile)
         } catch {
             fatalError(error.localizedDescription)
         }

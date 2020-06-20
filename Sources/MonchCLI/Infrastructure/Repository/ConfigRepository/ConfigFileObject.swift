@@ -99,7 +99,7 @@ struct GithubFileObject: Decodable {
 
 extension Config {
     init(configFileObject obj: ConfigFileObject) throws {
-            try checkNil(obj)
+        try checkNil(obj)
         self.init(
             chatwork: Chatwork(
                 token: obj.chatwork!.token!,

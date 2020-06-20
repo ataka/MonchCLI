@@ -99,7 +99,7 @@ struct GithubFileObject: Decodable {
 
 extension Config {
     init(configFileObject obj: ConfigFileObject) throws {
-        _ = try checkNil(obj)
+            try checkNil(obj)
         self.init(
             chatwork: Chatwork(
                 token: obj.chatwork!.token!,
@@ -114,23 +114,27 @@ extension Config {
     }
 }
 
-private func checkNil<T>(_ x: T, labels: [String] = []) throws -> Bool {
-    let mirror = Mirror(reflecting: x)
-    guard let displayStyle = mirror.displayStyle else { return true }
+private func checkNil<T>(_ x: T) throws {
+    func checkNil<T>(_ x: T, labels: [String]) throws -> Bool {
+        let mirror = Mirror(reflecting: x)
+        guard let displayStyle = mirror.displayStyle else { return true }
 
-    switch displayStyle {
-    case .optional:
-        guard let unwrappedValue = mirror.children.first?.value else { return false }
-        return try checkNil(unwrappedValue, labels: labels)
-    case .collection:
-        return !mirror.children.isEmpty
-    default:
-        return try mirror.children.reduce(true) {
-            let newLabels = labels + [$1.label!]
-            guard try checkNil($1.value, labels: newLabels) else {
-                throw(ConfigFileError.noProperty(name: newLabels.joined(separator: ".")))
+        switch displayStyle {
+        case .optional:
+            guard let unwrappedValue = mirror.children.first?.value else { return false }
+            return try checkNil(unwrappedValue, labels: labels)
+        case .collection:
+            return !mirror.children.isEmpty
+        default:
+            return try mirror.children.reduce(true) {
+                let newLabels = labels + [$1.label!]
+                guard try checkNil($1.value, labels: newLabels) else {
+                    throw(ConfigFileError.noProperty(name: newLabels.joined(separator: ".")))
+                }
+                return $0
             }
-            return $0
         }
     }
+
+    _ = try checkNil(x, labels: [])
 }

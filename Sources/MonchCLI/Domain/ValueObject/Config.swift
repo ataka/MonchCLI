@@ -41,7 +41,7 @@ extension Config {
 
         func validate() throws {
             guard !token.isEmpty       else { throw(ConfigFileError.gitHubTokenEmpty) }
-            guard token.isAlphaNumeric else { throw(ConfigFileError.gitHubTokenEmpty) }
+            guard token.isAlphaNumeric else { throw(ConfigFileError.gitHubTokenWrongCharacter) }
             return
         }
     }

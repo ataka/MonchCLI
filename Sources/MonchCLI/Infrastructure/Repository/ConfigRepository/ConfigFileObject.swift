@@ -132,7 +132,7 @@ private func checkNil<T>(_ x: T, labels: [String] = []) -> Bool {
                 設定ファイル .monch.json で、次のプロパティーがセットされていないようです。
                 設定ファイルを確認してください。
 
-                設定されていないプロパティー: (newLabels.joined(separator: ".")
+                設定されていないプロパティー: \(newLabels.joined(separator: "."))
                 """
                 fatalError(message)
             }

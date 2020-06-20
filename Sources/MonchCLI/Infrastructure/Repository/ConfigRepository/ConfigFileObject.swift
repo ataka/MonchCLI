@@ -126,7 +126,7 @@ private func checkNil<T>(_ x: T, labels: [String] = []) throws -> Bool {
         return !mirror.children.isEmpty
     default:
         return try mirror.children.reduce(true) {
-            let newLabels = labels + [ $1.label!]
+            let newLabels = labels + [$1.label!]
             guard try checkNil($1.value, labels: newLabels) else {
                 throw(ConfigFileError.noProperty(name: newLabels.joined(separator: ".")))
             }

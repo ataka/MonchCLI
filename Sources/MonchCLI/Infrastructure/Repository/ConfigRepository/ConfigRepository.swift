@@ -12,13 +12,16 @@ struct ConfigRepository {
         do {
             let configFileObject = try ConfigFileObject.paths
                 .lazy
-                .filter { FileManager.default.fileExists(atPath: $0) }
+                .filter(FileManager.default.fileExists(atPath:))
                 .map { try ConfigFileObjectFactory.make(path: $0) }
                 .reduce(ConfigFileObject.empty) { $0.merging($1) }
 
-            let config = Config(configFileObject: configFileObject)
-            guard config.isValid() else { fatalError("BANG") }
+            let config = try Config(configFileObject: configFileObject)
+            try config.validate()
             return config
+        } catch let error as ConfigFileError {
+            print(error.localizedDescription)
+            exit(.invalidConfigFile)
         } catch {
             fatalError(error.localizedDescription)
         }

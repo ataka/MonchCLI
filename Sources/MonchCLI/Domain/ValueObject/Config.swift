@@ -12,10 +12,12 @@ struct Config {
     let github: Github
     let reviewers: [Reviewer]
 
-    func isValid() -> Bool {
-        chatwork.isValid()
-            && github.isValid()
-            && reviewers.reduce(true) { $0 && $1.isValid() }
+    func validate() throws {
+        try chatwork.validate()
+        try github.validate()
+        try reviewers.forEach {
+            try $0.validate()
+        }
     }
 }
 
@@ -24,14 +26,10 @@ extension Config {
         let token: String
         let roomId: Int
 
-        func isValid() -> Bool {
-            guard !token.isEmpty else {
-                fatalError("Chatwork Token が空です。設定ファイルを確認してください。")
-            }
-            guard token.isAlphaNumeric else {
-                fatalError("Chatwork Token はアルファベットと数字の組み合わせです。設定ファイルを確認してください。")
-            }
-            return true
+        func validate() throws {
+            guard !token.isEmpty       else { throw(ConfigFileError.chatworkTokenEmpty) }
+            guard token.isAlphaNumeric else { throw(ConfigFileError.chatworkTokenWrongCharacter) }
+            return
         }
     }
 }
@@ -41,14 +39,10 @@ extension Config {
         let token: String
         let repository: String
 
-        func isValid() -> Bool {
-            guard !token.isEmpty else {
-                fatalError("GitHub Token が空です。設定ファイルを確認してください。")
-            }
-            guard token.isAlphaNumeric else {
-                fatalError("GitHub Token はアルファベットと数字の組み合わせです。設定ファイルを確認してください。")
-            }
-            return true
+        func validate() throws {
+            guard !token.isEmpty       else { throw(ConfigFileError.gitHubTokenEmpty) }
+            guard token.isAlphaNumeric else { throw(ConfigFileError.gitHubTokenWrongCharacter) }
+            return
         }
     }
 }

@@ -98,8 +98,8 @@ struct GithubFileObject: Decodable {
 }
 
 extension Config {
-    init(configFileObject obj: ConfigFileObject) {
-        guard checkNil(obj) else { fatalError("BANG!") }
+    init(configFileObject obj: ConfigFileObject) throws {
+        try checkNil(obj)
         self.init(
             chatwork: Chatwork(
                 token: obj.chatwork!.token!,
@@ -114,29 +114,27 @@ extension Config {
     }
 }
 
-private func checkNil<T>(_ x: T, labels: [String] = []) -> Bool {
-    let mirror = Mirror(reflecting: x)
-    guard let displayStyle = mirror.displayStyle else { return true }
+private func checkNil<T>(_ x: T) throws {
+    func checkNil<T>(_ x: T, labels: [String]) throws -> Bool {
+        let mirror = Mirror(reflecting: x)
+        guard let displayStyle = mirror.displayStyle else { return true }
 
-    switch displayStyle {
-    case .optional:
-        guard let unwrappedValue = mirror.children.first?.value else { return false }
-        return checkNil(unwrappedValue, labels: labels)
-    case .collection:
-        return !mirror.children.isEmpty
-    default:
-        return mirror.children.reduce(true) {
-            let newLabels = labels + [ $1.label!]
-            guard checkNil($1.value, labels: newLabels) else {
-                let message = """
-                設定ファイル .monch.json で、次のプロパティーがセットされていないようです。
-                設定ファイルを確認してください。
-
-                設定されていないプロパティー: (newLabels.joined(separator: ".")
-                """
-                fatalError(message)
+        switch displayStyle {
+        case .optional:
+            guard let unwrappedValue = mirror.children.first?.value else { return false }
+            return try checkNil(unwrappedValue, labels: labels)
+        case .collection:
+            return !mirror.children.isEmpty
+        default:
+            return try mirror.children.reduce(true) {
+                let newLabels = labels + [$1.label!]
+                guard try checkNil($1.value, labels: newLabels) else {
+                    throw(ConfigFileError.noProperty(name: newLabels.joined(separator: ".")))
+                }
+                return $0
             }
-            return $0
         }
     }
+
+    _ = try checkNil(x, labels: [])
 }

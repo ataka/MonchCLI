@@ -17,7 +17,7 @@ enum Deadline: Int, CaseIterable {
         case .today:
             return "急いでいます。今日中で!!"
         case .aFewDaysLater:
-            return "時間のある時にやって欲しいです。二営業日以"
+            return "時間のある時にやって欲しいです。二営業日以内で!"
         case .twoWeeksLater:
             return "急いでいません。でも忘れてもらっては困ります。二週間以内に。"
         }

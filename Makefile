@@ -12,7 +12,7 @@ install: compile
 #
 # Prepare git hook
 #
-.PHONE : prepare_git_hook
+.PHONY : prepare_git_hook
 .git/hooks/post-checkout:
 	scripts/prepare-git-hook.rb $@
 	chmod 755 $@

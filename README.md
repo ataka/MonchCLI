@@ -25,13 +25,13 @@ $ make install
 
 HOME ディレクトリー直下にファイル `.monch.json` を作り、次の内容を書きます:
 
-``` json
+``` json5
 {
     "chatwork": {
-        "token": "あなたの Chatwork API トークン"
+        "token": "01234abcdef" // あなたの Chatwork API トークン
     },
     "github": {
-        "token": "あなたの GitHub Personal Access トークン"
+        "token": "56789uvwxyz" // あなたの GitHub Personal Access トークン
     }
 }
 ```
@@ -40,23 +40,31 @@ HOME ディレクトリー直下にファイル `.monch.json` を作り、次の
 
 「あなたの GitHub Personal Access トークン」は [コマンドライン用の個人アクセストークンを作成する \- GitHub ヘルプ](https://help.github.com/ja/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line) を参考に取得します。トークンに付与するスコープは **repo** だけで十分です。取得したトークンを設定ファイルの「あなたの GitHub Personal Access トークン」の部分に書きます。
 
+コメント部分は削除してください。
+
 ### プロジェクト用の設定ファイル
 
 MonchCLI を使いたいプロジェクトのトップ・ディレクトリー直下に `.monch.json` を作り、次の内容を書きます。
 
-``` json
+``` json5
 {
     "chatwork": {
-        "roomId": タスクを振る Chatwork のルームID
+        "roomId": 12345 // タスクを振る Chatwork のルームID
     },
     "github": {
-        "repository": 対象の GitHub リポジトリー (`ataka/MonchCLI` の書式で...)
+        "repository": "ataka/MonchCLI" // 対象の GitHub リポジトリー (`` の書式で...)
     },
     "reviewers": [
-        { "name": "レビュワーの名前",  "chatworkId": Chatwork のアカウントID,  "githubLogin": "GitHub でのログイン名" }
+        { 
+            "name": "安宅正之",    // レビューワーの名前
+            "chatworkId": "67890", // ChatworkのアカウントID
+            "githubLogin": "ataka" // GitHub でのログイン名
+        }
     ]
 }
 ```
+
+コメント部分は削除してください。
 
 ## 利用方法
 

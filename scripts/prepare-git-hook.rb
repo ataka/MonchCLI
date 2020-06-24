@@ -5,7 +5,9 @@ def main()
   scripts = <<-EOS
 #!/bin/sh
 
-./scripts/update-version.rb $1 $2 $3
+if [ -x ./scripts/update-version.rb ]; then
+    ./scripts/update-version.rb $1 $2 $3
+fi
   EOS
 
   File.open(hook_file, "w") { |f|

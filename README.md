@@ -4,7 +4,9 @@
     <a href="https://github.com/ataka/MonchCLI/blob/develop/LICENSE">
         <img alt="GitHub license" src="https://img.shields.io/github/license/ataka/MonchCLI"/>
     </a>
-    <img alt="Swift 5.2" src="https://img.shields.io/badge/Swift-5.2-orange.svg"/>
+    <a href="https://docs.swift.org/swift-book/index.html">
+        <img alt="Swift 5.2" src="https://img.shields.io/badge/Swift-5.2-orange.svg"/>
+    </a>
     <a href="https://github.com/ataka/MonchCLI/releases">
         <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/ataka/MonchCLI">
     </a>

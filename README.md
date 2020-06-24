@@ -1,14 +1,14 @@
 
-<h1 id="monchcli">
-  MonchCLI<br/>
-  <a href="https://github.com/ataka/MonchCLI/blob/develop/LICENSE">
-    <img alt="GitHub license" src="https://img.shields.io/github/license/ataka/MonchCLI"/>
-  </a>
-  <img alt="Swift 5.2" src="https://img.shields.io/badge/Swift-5.2-orange.svg"/>
-  <a href="https://github.com/ataka/MonchCLI/releases">
-    <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/ataka/MonchCLI">
-  </a>
-</h1>
+# MonchCLI
+<p>
+    <a href="https://github.com/ataka/MonchCLI/blob/develop/LICENSE">
+        <img alt="GitHub license" src="https://img.shields.io/github/license/ataka/MonchCLI"/>
+    </a>
+    <img alt="Swift 5.2" src="https://img.shields.io/badge/Swift-5.2-orange.svg"/>
+    <a href="https://github.com/ataka/MonchCLI/releases">
+        <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/ataka/MonchCLI">
+    </a>
+</p>
 
 MonchCLI はレビュー依頼を簡便にするためのコマンドツールです。
 

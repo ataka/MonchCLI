@@ -1,4 +1,3 @@
-
 # MonchCLI
 <p>
     <a href="https://github.com/ataka/MonchCLI/blob/develop/LICENSE">
@@ -103,3 +102,7 @@ Inspiration for this tool came from an [@astronaughts](https://github.com/astron
 ## License
 
 MonchCLI is licensed under the MIT license.  See [LICENSE](https://github.com/ataka/MonchCLI/blob/master/LICENSE) for more info.
+
+<!-- Local Variables: -->
+<!-- mode: gfm -->
+<!-- End: -->

@@ -13,10 +13,10 @@ extension Monch {
         static var configuration = CommandConfiguration(abstract: "PR のレビューを依頼する")
 
         @Flag(name: [.long, .customShort("c")], help: "GitHub ユーザーのキャッシュをクリアします")
-        var clearCache: Bool
+        var clearCache: Bool = false
 
         @Flag(name: [.long, .customShort("a")], help: "すべての PR を表示します")
-        var showsAllPullRequests: Bool
+        var showsAllPullRequests: Bool = false
 
         mutating func run() {
             let config = ConfigRepository().fetch()

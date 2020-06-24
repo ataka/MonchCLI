@@ -15,5 +15,6 @@ install: compile
 .PHONE : prepare_git_hook
 .git/hooks/post-checkout:
 	scripts/prepare-git-hook.rb $@
+	chmod 755 $@
 
 prepare_git_hook: .git/hooks/post-checkout

@@ -20,49 +20,28 @@ extension Monch {
 
         mutating func run() {
             let config = ConfigRepository().fetch()
+            let option = ReviewService.Option(clearsCache: clearCache,
+                                              showsAllPullRequests: showsAllPullRequests)
+            let service: ReviewService = { config, option in
+                let gitHubClient = GithubClient(config: config.github)
+                let chatworkClient = ChatworkClient(config: config.chatwork)
+                return ReviewService(config: config,
+                                     option: option,
+                                     gitHubClient: gitHubClient,
+                                     chatworkClint: chatworkClient)
+            }(config, option)
 
             let semaphore = DispatchSemaphore(value: 0)
-            selectPullRequests(with: config) { [self] pullRequest in
+            service.selectPullRequest() { [self] pullRequests, authUser in
+                let pullRequest = SelectView<PullRequest>(message: "PR を番号で選択してください",
+                                                          items: pullRequests,
+                                                          getTitleHandler: \.title).getItem()
                 self.requestCodeReview(for: pullRequest, with: config) {
                     print("タスクを振りました。")
                     semaphore.signal()
                 }
             }
             semaphore.wait()
-        }
-
-        private func selectPullRequests(with config: Config, completionHandler: @escaping (PullRequest) -> Void) {
-            let githubClient = GithubClient(config: config.github)
-            getAuthenticatedUser(client: githubClient) { authUser in
-                let request = ListPullRequestsRequest(config: config.github)
-                githubClient.send(request) { pullRequests in
-                    let filteredPullRequests = pullRequests
-                        .filter(PullRequest.isListable(showsAll: self.showsAllPullRequests, authenticatedUser: authUser))
-                        .prefix(8)
-
-                    let pullRequest = SelectView<PullRequest>(message: "PR を番号で選択してください",
-                                                              items: filteredPullRequests,
-                                                              getTitleHandler: \.title).getItem()
-                    completionHandler(pullRequest)
-                }
-            }
-        }
-
-        private func getAuthenticatedUser(client: GithubClient, completionHandler: @escaping (GitHubUser) -> Void) {
-            let repository = GitHubAuthUserRepository()
-            if clearCache {
-                repository.delete()
-            }
-
-            guard let authUser = repository.fetch() else {
-                let request = GetAuthenticatedUserRequest()
-                client.send(request) { authUser in
-                    repository.save(authUser)
-                    completionHandler(authUser)
-                }
-                return
-            }
-            completionHandler(authUser)
         }
 
         private func requestCodeReview(for pullRequest: PullRequest, with config: Config, completionHandler: @escaping () -> Void) {

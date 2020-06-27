@@ -19,64 +19,39 @@ extension Monch {
         var showsAllPullRequests: Bool = false
 
         mutating func run() {
-            let config = ConfigRepository().fetch()
             let option = ReviewService.Option(clearsCache: clearCache,
                                               showsAllPullRequests: showsAllPullRequests)
-            let service: ReviewService = { config, option in
+            let service: ReviewService = { option in
+                let config = ConfigRepository().fetch()
                 let gitHubClient = GithubClient(config: config.github)
                 let chatworkClient = ChatworkClient(config: config.chatwork)
                 return ReviewService(config: config,
                                      option: option,
                                      gitHubClient: gitHubClient,
-                                     chatworkClint: chatworkClient)
-            }(config, option)
+                                     chatworkClient: chatworkClient)
+            }(option)
 
             let semaphore = DispatchSemaphore(value: 0)
-            service.selectPullRequest() { [self] pullRequests, authUser in
+            service.selectPullRequest() { pullRequests, authUser in
                 let pullRequest = SelectView<PullRequest>(message: "PR を番号で選択してください",
                                                           items: pullRequests,
                                                           getTitleHandler: \.title).getItem()
-                self.requestCodeReview(for: pullRequest, with: config) {
-                    print("タスクを振りました。")
-                    semaphore.signal()
+                service.selectReviewer(for: pullRequest) { reviewerList in
+                    let reviewers = SelectView<Reviewer>(message: "レビュワーを選んでください",
+                                                         items: reviewerList,
+                                                         getTitleHandler: \.name).getItems()
+                    service.selectDeadline { deadlineList in
+                        let deadline = SelectView<Deadline>(message: "しめ切りを設定してください",
+                                                            items: deadlineList,
+                                                            getTitleHandler: \.string).getItem()
+                        service.requestReview(for: pullRequest, to: reviewers, by: deadline) {
+                            print("タスクを振りました。")
+                            semaphore.signal()
+                        }
+                    }
                 }
             }
             semaphore.wait()
-        }
-
-        private func requestCodeReview(for pullRequest: PullRequest, with config: Config, completionHandler: @escaping () -> Void) {
-            let filteredReviewers = config.reviewers
-                .filter(Reviewer.isReviewable(with: pullRequest))
-            let reviewers = SelectView<Reviewer>(message: "レビュワーを選んでください",
-                                                 items: filteredReviewers,
-                                                 getTitleHandler: \.name).getItems()
-
-            let text = """
-            \(pullRequest.title)
-            \(pullRequest.htmlUrl)
-
-            レビューをお願いします (please)
-            """
-
-            let deadline = SelectView<Deadline>(message: "しめ切りを設定してください",
-                                                items: Deadline.allCases,
-                                                getTitleHandler: \.string).getItem()
-            guard let deadlineDate = deadline.getDate() else { return }
-
-            //        let request = CreateMessageRequest(roomId: config.chatwork.roomId, text: "Hello, This is MonchCLI!")
-            let request = CreateTaskRequest(roomId: config.chatwork.roomId, text: text, assigneeIds: reviewers.map(\.chatworkId), limitType: .date, deadline: deadlineDate)
-            let chatworkClient = ChatworkClient(config: config.chatwork)
-            chatworkClient.send(request) { taskResponse in
-                let request = CreateReviewRequestRequest(
-                    repository: config.github.repository,
-                    pullRequestId: pullRequest.number,
-                    reviewers: reviewers.map(\.githubLogin)
-                )
-                let githubClient = GithubClient(config: config.github)
-                githubClient.send(request) { pullRequest in
-                    completionHandler()
-                }
-            }
         }
     }
 }

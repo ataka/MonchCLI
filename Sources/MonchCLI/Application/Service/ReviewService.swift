@@ -16,7 +16,9 @@ struct ReviewService {
     let config: Config
     let option: Option
     let gitHubClient: GithubClient
-    let chatworkClint: ChatworkClient
+    let chatworkClient: ChatworkClient
+
+    // MARK: Select Pull Request
 
     func selectPullRequest(completionHandler: @escaping (_ pullRequests: ArraySlice<PullRequest>, _ authUser: GitHubUser) -> Void) {
         getAuthenticatedUser(clearsCache: option.clearsCache) { authUser in
@@ -46,5 +48,45 @@ struct ReviewService {
             return
         }
         completionHandler(authUser)
+    }
+
+    // MARK: Select Reviewer
+
+    func selectReviewer(for pullRequest: PullRequest, completionHandler: (_ reviewers: [Reviewer]) -> Void) {
+        completionHandler(config.reviewers
+            .filter(Reviewer.isReviewable(with: pullRequest)))
+    }
+
+    // MARK: Select Deadline
+
+    func selectDeadline(completionHandler: (_ deadlines: [Deadline]) -> Void) {
+        completionHandler(Deadline.allCases)
+    }
+
+    // MARK: Request Review
+
+    func requestReview(for pullRequest: PullRequest, to reviewers: [Reviewer], by deadline: Deadline, completionHandler: @escaping () -> Void) {
+        guard let deadlineDate = deadline.getDate() else { fatalError() }
+
+        let text = """
+        \(pullRequest.title)
+        \(pullRequest.htmlUrl)
+
+        レビューをお願いします (please)
+        """
+
+        let request = CreateTaskRequest(roomId: config.chatwork.roomId,
+                                        text: text,
+                                        assigneeIds: reviewers.map(\.chatworkId),
+                                        limitType: .date,
+                                        deadline: deadlineDate)
+        chatworkClient.send(request) { [self] taskResponse in
+            let request = CreateReviewRequestRequest(repository: self.config.github.repository,
+                                                     pullRequestId: pullRequest.number,
+                                                     reviewers: reviewers.map(\.githubLogin))
+            self.gitHubClient.send(request) { pullRequest in
+                completionHandler()
+            }
+        }
     }
 }

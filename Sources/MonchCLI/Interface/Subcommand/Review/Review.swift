@@ -19,17 +19,7 @@ extension Monch {
         var showsAllPullRequests: Bool = false
 
         mutating func run() {
-            let option = ReviewService.Option(clearsCache: clearCache,
-                                              showsAllPullRequests: showsAllPullRequests)
-            let service: ReviewService = { option in
-                let config = ConfigRepository().fetch()
-                let gitHubClient = GithubClient(config: config.github)
-                let chatworkClient = ChatworkClient(config: config.chatwork)
-                return ReviewService(config: config,
-                                     option: option,
-                                     gitHubClient: gitHubClient,
-                                     chatworkClient: chatworkClient)
-            }(option)
+            let service = makeService()
 
             let semaphore = DispatchSemaphore(value: 0)
             service.selectPullRequest() { pullRequests, authUser in
@@ -52,6 +42,18 @@ extension Monch {
                 }
             }
             semaphore.wait()
+        }
+
+        private func makeService() -> ReviewService {
+            let option = ReviewService.Option(clearsCache: clearCache,
+                                              showsAllPullRequests: showsAllPullRequests)
+            let config = ConfigRepository().fetch()
+            let gitHubClient = GithubClient(config: config.github)
+            let chatworkClient = ChatworkClient(config: config.chatwork)
+            return ReviewService(config: config,
+                                 option: option,
+                                 gitHubClient: gitHubClient,
+                                 chatworkClient: chatworkClient)
         }
     }
 }

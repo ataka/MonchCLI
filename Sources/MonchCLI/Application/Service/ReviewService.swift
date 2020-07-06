@@ -1,0 +1,92 @@
+//
+//  ReviewService.swift
+//  MonchCLI
+//
+//  Created by 安宅正之 on 2020/06/27.
+//
+
+import Foundation
+
+struct ReviewService {
+    struct Option {
+        let clearsCache: Bool
+        let showsAllPullRequests: Bool
+    }
+
+    let config: Config
+    let option: Option
+    let gitHubClient: GithubClient
+    let chatworkClient: ChatworkClient
+
+    // MARK: Select Pull Request
+
+    func selectPullRequest(completionHandler: @escaping (_ pullRequests: ArraySlice<PullRequest>, _ authUser: GitHubUser) -> Void) {
+        getAuthenticatedUser(clearsCache: option.clearsCache) { authUser in
+            let request = ListPullRequestsRequest(config: self.config.github)
+            self.gitHubClient.send(request) { pullRequests in
+                let filteredPullRequests = pullRequests
+                    .filter(PullRequest.isListable(showsAll: self.option.showsAllPullRequests, authenticatedUser: authUser))
+                    .prefix(8)
+
+                completionHandler(filteredPullRequests, authUser)
+            }
+        }
+    }
+
+    private func getAuthenticatedUser(clearsCache: Bool, completionHandler: @escaping (GitHubUser) -> Void) {
+        let repository = GitHubAuthUserRepository()
+        if clearsCache {
+            repository.delete()
+        }
+
+        guard let authUser = repository.fetch() else {
+            let request = GetAuthenticatedUserRequest()
+            gitHubClient.send(request) { authUser in
+                repository.save(authUser)
+                completionHandler(authUser)
+            }
+            return
+        }
+        completionHandler(authUser)
+    }
+
+    // MARK: Select Reviewer
+
+    func selectReviewer(for pullRequest: PullRequest, completionHandler: (_ reviewers: [Reviewer]) -> Void) {
+        completionHandler(config.reviewers
+            .filter(Reviewer.isReviewable(with: pullRequest)))
+    }
+
+    // MARK: Select Deadline
+
+    func selectDeadline(completionHandler: (_ deadlines: [Deadline]) -> Void) {
+        completionHandler(Deadline.allCases)
+    }
+
+    // MARK: Request Review
+
+    func requestReview(for pullRequest: PullRequest, to reviewers: [Reviewer], by deadline: Deadline, completionHandler: @escaping () -> Void) {
+        guard let deadlineDate = deadline.getDate() else { fatalError() }
+
+        let text = """
+        \(pullRequest.title)
+        \(pullRequest.htmlUrl)
+
+        レビューをお願いします (please)
+        """
+
+        let request = CreateTaskRequest(roomId: config.chatwork.roomId,
+                                        text: text,
+                                        assigneeIds: reviewers.map(\.chatworkId),
+                                        limitType: .date,
+                                        deadline: deadlineDate)
+        chatworkClient.send(request) { [self] taskResponse in
+            let request = CreateReviewRequestRequest(repository: self.config.github.repository,
+                                                     pullRequestId: pullRequest.number,
+                                                     reviewers: reviewers.map(\.githubLogin))
+            self.gitHubClient.send(request) { pullRequest in
+                completionHandler()
+            }
+        }
+    }
+}

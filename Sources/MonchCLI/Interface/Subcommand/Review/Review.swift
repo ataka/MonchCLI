@@ -22,14 +22,20 @@ extension Monch {
             let service = makeService()
 
             let semaphore = DispatchSemaphore(value: 0)
-            service.selectPullRequest() { pullRequests, authUser in
+            service.selectPullRequest() { pullRequests, requestedReviewers, authUser in
                 let pullRequest = SelectView<PullRequest>(message: "PR を番号で選択してください",
                                                           items: pullRequests,
                                                           getTitleHandler: \.title).getItem()
-                service.selectReviewer(for: pullRequest) { reviewerList in
-                    let reviewers = SelectView<Reviewer>(message: "レビュワーを選んでください",
+                service.selectReviewer(for: pullRequest, with: requestedReviewers) { reviewerList, loginCountMap in
+                    let reviewers = SelectView<Reviewer>(message: "レビュワーを選んでください\nヒント: 数字はその候補者がレビュー中の Pull Request の数です",
                                                          items: reviewerList,
-                                                         getTitleHandler: \.name).getItems()
+                                                         getTitleHandler: {
+                                                            if let count = loginCountMap[$0.githubLogin] {
+                                                                return "\($0.name) (\(count))"
+                                                            } else {
+                                                                return "\($0.name)"
+                                                            }
+                    }).getItems()
                     service.selectDeadline { deadlineList in
                         let deadline = SelectView<Deadline>(message: "しめ切りを設定してください",
                                                             items: deadlineList,

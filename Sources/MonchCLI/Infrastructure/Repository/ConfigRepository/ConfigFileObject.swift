@@ -10,6 +10,7 @@ import Foundation
 struct ConfigFileObject: Decodable {
     private static let systemFileName = "monch.json"
     private static let fileName = ".monch.json"
+    private static let nullableProperties = ["customQueries"]
 
     let chatwork: ChatworkFileObject?
     let github: GithubFileObject?
@@ -62,6 +63,12 @@ struct ConfigFileObject: Decodable {
             reviewers: (reviewers ?? []).merging(other.reviewers),
             customQueries: (customQueries ?? []) + (other.customQueries ?? [])
         )
+    }
+
+    // MARK: CheckNil utils
+
+    fileprivate static func shouldCheckNil(_ property: Mirror.Child) -> Bool {
+        !nullableProperties.contains(property.label!)
     }
 }
 
@@ -132,6 +139,7 @@ private func checkNil<T>(_ x: T) throws {
         default:
             return try mirror.children.reduce(true) {
                 let newLabels = labels + [$1.label!]
+                guard ConfigFileObject.shouldCheckNil($1) else { return $0 }
                 guard try checkNil($1.value, labels: newLabels) else {
                     throw(ConfigFileError.noProperty(name: newLabels.joined(separator: ".")))
                 }

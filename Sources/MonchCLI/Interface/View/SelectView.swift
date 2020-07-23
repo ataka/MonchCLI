@@ -12,25 +12,27 @@ struct SelectView<T> {
     typealias Items = AnyCollection<Item>
     typealias GetTitleHandler = (_ item: Item) -> String
     private let message: String
+    private let hint: String?
     private let items: Items
     private let getTitleHandler: GetTitleHandler
 
-    init<C>(message: String, items: C, getTitleHandler: @escaping (_ item: Item) -> String) where C: Collection, C.Element == Item {
+    init<C>(message: String, hint: String? = nil, items: C, getTitleHandler: @escaping (_ item: Item) -> String) where C: Collection, C.Element == Item {
         self.message = message
+        self.hint = hint
         self.items = AnyCollection<Item>(items)
         self.getTitleHandler = getTitleHandler
     }
 
     func getItem() -> Item {
-        func getItem(from items: Items, with message: String) -> Item {
-            print("\n> \(message): \n? ", terminator: "")
+        func getItem(from items: Items, with queryText: String) -> Item {
+            print(queryText, terminator: "")
 
             let indexInt: Int
             do {
                 indexInt = try readInt(for: items)
             } catch let error as ReadIntError {
                 print(error.localizedDescription)
-                return getItem(from: items, with: message)
+                return getItem(from: items, with: queryText)
             } catch {
                 print(error.localizedDescription)
                 fatalError("Unknown error!")
@@ -39,9 +41,17 @@ struct SelectView<T> {
 
             return items[index]
         }
+        func makeQueryText(message: String, hint: String?) -> String {
+            if let hint = hint {
+                return "\n> \(message):\nヒント: \(hint)\n? "
+            } else {
+                return "\n> \(message):\n? "
+            }
+        }
 
         print(makeListText(items: items, getTitle: getTitleHandler))
-        return getItem(from: items, with: message)
+        let queryText = makeQueryText(message: message, hint: hint)
+        return getItem(from: items, with: queryText)
     }
 
     private func makeListText(items: Items, getTitle: GetTitleHandler) -> String {
@@ -63,15 +73,15 @@ struct SelectView<T> {
     }
 
     func getItems() -> [Item] {
-        func getItems(from items: Items, with message: String) -> [Item] {
-            print("\n> \(message): (カンマ区切りで複数選択可)\n? ", terminator: "")
+        func getItems(from items: Items, with queryText: String) -> [Item] {
+            print(queryText, terminator: "")
 
             let indexesInt: [Int]
             do {
                 indexesInt = try readInts(for: items)
             } catch let error as ReadIntError {
                 print(error.localizedDescription)
-                return getItems(from: items, with: message)
+                return getItems(from: items, with: queryText)
             } catch {
                 print(error.localizedDescription)
                 fatalError("Unknown error!")
@@ -81,9 +91,17 @@ struct SelectView<T> {
                 .map(AnyIndex.init)
                 .map { items[$0] }
         }
+        func makeQueryText(message: String, hint: String?) -> String {
+            if let hint = hint {
+                return "\n> \(message): (カンマ区切りで複数選択可)\nヒント: \(hint)\n? "
+            } else {
+                return "\n> \(message): (カンマ区切りで複数選択可)\n? "
+            }
+        }
 
         print(makeListText(items: items, getTitle: getTitleHandler))
-        return getItems(from: items, with: message)
+        let queryText = makeQueryText(message: message, hint: hint)
+        return getItems(from: items, with: queryText)
     }
 
     private func readInts(for items: Items) throws -> [Int] {

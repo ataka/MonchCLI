@@ -20,15 +20,16 @@ struct ReviewService {
 
     // MARK: Select Pull Request
 
-    func selectPullRequest(completionHandler: @escaping (_ pullRequests: ArraySlice<PullRequest>, _ authUser: GitHubUser) -> Void) {
+    func selectPullRequest(completionHandler: @escaping (_ pullRequests: ArraySlice<PullRequest>, _ requestedReviewers: [GitHubUser], _ authUser: GitHubUser) -> Void) {
         getAuthenticatedUser(clearsCache: option.clearsCache) { authUser in
             let request = ListPullRequestsRequest(config: self.config.github)
             self.gitHubClient.send(request) { pullRequests in
                 let filteredPullRequests = pullRequests
                     .filter(PullRequest.isListable(showsAll: self.option.showsAllPullRequests, authenticatedUser: authUser))
                     .prefix(8)
+                let requestedReviewers = pullRequests.flatMap(\.requestedReviewers)
 
-                completionHandler(filteredPullRequests, authUser)
+                completionHandler(filteredPullRequests, requestedReviewers, authUser)
             }
         }
     }
@@ -52,9 +53,13 @@ struct ReviewService {
 
     // MARK: Select Reviewer
 
-    func selectReviewer(for pullRequest: PullRequest, completionHandler: (_ reviewers: [Reviewer]) -> Void) {
-        completionHandler(config.reviewers
-            .filter(Reviewer.isReviewable(with: pullRequest)))
+    func selectReviewer(for pullRequest: PullRequest, with requestedReviewers: [GitHubUser], completionHandler: (_ reviewers: [Reviewer], _ loginCountMap: [GitHubLogin: Int]) -> Void) {
+        let filteredReviewers = config.reviewers
+            .filter(Reviewer.isReviewable(with: pullRequest))
+        let loginCountMap: [GitHubLogin: Int] = requestedReviewers
+            .reduce(into: [GitHubLogin: Int]()) { $0[$1.login, default: 0] += 1 }
+
+        completionHandler(filteredReviewers, loginCountMap)
     }
 
     // MARK: Select Deadline

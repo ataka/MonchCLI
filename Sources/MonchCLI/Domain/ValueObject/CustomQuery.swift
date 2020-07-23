@@ -22,7 +22,20 @@ struct CustomQuery: Decodable {
 
     // MARK: Domain Logic
 
+    func validate() throws {
+        guard !message.isEmpty                else { throw(ConfigFileError.customQueryMessageEmpty) }
+        guard !format.isEmpty                 else { throw(ConfigFileError.customQueryFormatEmpty) }
+        guard format.occurrence(of: "%@") < 2 else { throw(ConfigFileError.customQueryFormatTooManyAtMark) }
+        return
+    }
+
     func getAnswer(with result: String) -> Answer {
         Answer(format: format, result: result)
+    }
+}
+
+private extension String {
+    func occurrence(of substr: String) -> Int {
+        { $0.isEmpty ? 0 : $0.count - 1 }(self.components(separatedBy: substr))
     }
 }

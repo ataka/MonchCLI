@@ -19,6 +19,9 @@ struct Config {
         try reviewers.forEach {
             try $0.validate()
         }
+        try customQueries.forEach {
+            try $0.validate()
+        }
     }
 }
 

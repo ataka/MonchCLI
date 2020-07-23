@@ -4,10 +4,14 @@ PREFIX = /usr/local
 compile:
 	swift build --disable-sandbox -c release
 
+.PHONY : prefix_install
+prefix_install: compile
+	mkdir -p $(PREFIX)/bin
+	cp -p ./.build/release/monch $(PREFIX)/bin
+
 .PHONY : install
-install: compile
-	sudo mkdir -p $(PREFIX)/bin
-	sudo cp -p ./.build/release/monch $(PREFIX)/bin
+install:
+	make prefix_install PREFIX=/usr/local
 
 #
 # Prepare git hook

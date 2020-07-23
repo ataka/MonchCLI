@@ -27,7 +27,8 @@ extension Monch {
                                                           items: pullRequests,
                                                           getTitleHandler: \.title).getItem()
                 service.selectReviewer(for: pullRequest, with: requestedReviewers) { reviewerList, loginCountMap in
-                    let reviewers = SelectView<Reviewer>(message: "レビュワーを選んでください\nヒント: 数字はその候補者がレビュー中の Pull Request の数です",
+                    let reviewers = SelectView<Reviewer>(message: "レビュワーを選んでください",
+                                                         hint: "(数字) は、その候補者が何本の PR をレビュー中かを表します",
                                                          items: reviewerList,
                                                          getTitleHandler: {
                                                             if let count = loginCountMap[$0.githubLogin] {

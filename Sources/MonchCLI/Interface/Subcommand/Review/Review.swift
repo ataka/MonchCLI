@@ -42,10 +42,9 @@ extension Monch {
                                                             items: deadlineList,
                                                             getTitleHandler: \.string).getItem()
                         service.answerCustomQuery { customQueries in
-                            let answers: [CustomQuery.Answer] = customQueries.map { customQuery in
-                                print("\n\(customQuery.message): \n? ", terminator: "")
-                                guard let input = readLine() else { fatalError() }
-                                return customQuery.getAnswer(with: input)
+                            let answers: [CustomQuery.Answer] = customQueries.map {
+                                TextReader<CustomQuery.Answer>(message: $0.message, completionHandler: $0.getAnswer(with:))
+                                    .read()
                             }
                             service.requestReview(for: pullRequest, to: reviewers, by: deadline, withCustomQueryAnswers: answers) {
                                 print("タスクを振りました。")

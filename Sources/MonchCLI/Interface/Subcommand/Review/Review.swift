@@ -41,9 +41,16 @@ extension Monch {
                         let deadline = SelectView<Deadline>(message: "しめ切りを設定してください",
                                                             items: deadlineList,
                                                             getTitleHandler: \.string).getItem()
-                        service.requestReview(for: pullRequest, to: reviewers, by: deadline) {
-                            print("タスクを振りました。")
-                            semaphore.signal()
+                        service.answerCustomQuery { customQueries in
+                            let answers: [CustomQuery.Answer] = customQueries.map { customQuery in
+                                print("\n\(customQuery.message): \n? ", terminator: "")
+                                guard let input = readLine() else { fatalError() }
+                                return customQuery.getAnswer(with: input)
+                            }
+                            service.requestReview(for: pullRequest, to: reviewers, by: deadline, withCustomQueryAnswers: answers) {
+                                print("タスクを振りました。")
+                                semaphore.signal()
+                            }
                         }
                     }
                 }

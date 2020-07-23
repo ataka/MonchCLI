@@ -14,6 +14,7 @@ struct ConfigFileObject: Decodable {
     let chatwork: ChatworkFileObject?
     let github: GithubFileObject?
     let reviewers: [Reviewer]?
+    let customQueries: [CustomQuery]?
 
     // MARK: Path
 
@@ -49,7 +50,8 @@ struct ConfigFileObject: Decodable {
         ConfigFileObject(
             chatwork: nil,
             github: nil,
-            reviewers: []
+            reviewers: [],
+            customQueries: []
         )
     }
 
@@ -57,7 +59,8 @@ struct ConfigFileObject: Decodable {
         ConfigFileObject(
             chatwork: chatwork?.merging(other.chatwork) ?? other.chatwork,
             github: github?.merging(other.github) ?? other.github,
-            reviewers: (reviewers ?? []).merging(other.reviewers)
+            reviewers: (reviewers ?? []).merging(other.reviewers),
+            customQueries: (customQueries ?? []) + (other.customQueries ?? [])
         )
     }
 }
@@ -109,7 +112,8 @@ extension Config {
                 token: obj.github!.token!,
                 repository: obj.github!.repository!
             ),
-            reviewers: obj.reviewers!
+            reviewers: obj.reviewers!,
+            customQueries: obj.customQueries!
         )
     }
 }

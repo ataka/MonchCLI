@@ -11,6 +11,7 @@ struct Config {
     let chatwork: Chatwork
     let github: Github
     let reviewers: [Reviewer]
+    let customQueries: [CustomQuery]
 
     func validate() throws {
         try chatwork.validate()

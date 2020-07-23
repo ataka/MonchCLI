@@ -68,20 +68,19 @@ struct ReviewService {
         completionHandler(Deadline.allCases)
     }
 
+    // MARK: Answer Custom Query
+
+    func answerCustomQuery(completionHandler: (_ customQueries: [CustomQuery]) -> Void) {
+        completionHandler(config.customQueries)
+    }
+
     // MARK: Request Review
 
-    func requestReview(for pullRequest: PullRequest, to reviewers: [Reviewer], by deadline: Deadline, completionHandler: @escaping () -> Void) {
+    func requestReview(for pullRequest: PullRequest, to reviewers: [Reviewer], by deadline: Deadline, withCustomQueryAnswers answers: [CustomQuery.Answer], completionHandler: @escaping () -> Void) {
         guard let deadlineDate = deadline.getDate() else { fatalError() }
 
-        let text = """
-        \(pullRequest.title)
-        \(pullRequest.htmlUrl)
-
-        レビューをお願いします (please)
-        """
-
         let request = CreateTaskRequest(roomId: config.chatwork.roomId,
-                                        text: text,
+                                        text: makeTaskText(pullRequest: pullRequest, answers: answers),
                                         assigneeIds: reviewers.map(\.chatworkId),
                                         limitType: .date,
                                         deadline: deadlineDate)
@@ -92,6 +91,26 @@ struct ReviewService {
             self.gitHubClient.send(request) { pullRequest in
                 completionHandler()
             }
+        }
+    }
+
+    private func makeTaskText(pullRequest: PullRequest, answers: [CustomQuery.Answer]) -> String {
+        if answers.isEmpty {
+            return """
+            \(pullRequest.title)
+            \(pullRequest.htmlUrl)
+
+            レビューをお願いします (please)
+            """
+        } else {
+            return """
+            \(pullRequest.title)
+            \(pullRequest.htmlUrl)
+
+            \(answers.map(\.rawValue).joined(separator: "\n"))
+
+            レビューをお願いします (please)
+            """
         }
     }
 }

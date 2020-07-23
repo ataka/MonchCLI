@@ -22,6 +22,11 @@ struct ConfigRepository {
         } catch let error as ConfigFileError {
             print(error.localizedDescription)
             exit(.invalidConfigFile)
+        } catch DecodingError.keyNotFound(let key, let context) {
+            let path = context.codingPath.map(\.stringValue) + [key.stringValue]
+            let propertyName = path.joined(separator: ".")
+            print(ConfigFileError.noProperty(name: propertyName).localizedDescription)
+            exit(.invalidConfigFile)
         } catch {
             fatalError(error.localizedDescription)
         }

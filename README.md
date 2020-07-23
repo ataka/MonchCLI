@@ -74,7 +74,7 @@ MonchCLI を使いたいプロジェクトのトップ・ディレクトリー�
     "reviewers": [
         { 
             "name": "安宅正之",    // レビューワーの名前
-            "chatworkId": "67890", // ChatworkのアカウントID
+            "chatworkId": 67890,   // ChatworkのアカウントID
             "githubLogin": "ataka" // GitHub でのログイン名
         }
     ]

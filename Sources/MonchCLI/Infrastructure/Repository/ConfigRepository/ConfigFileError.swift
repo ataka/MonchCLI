@@ -18,6 +18,10 @@ enum ConfigFileError: Error {
     // MARK: Reviewer
     case reviewerNameEmpty
     case reviewerGitHubLoginEmpty
+    // MARK: CustomQuery
+    case customQueryMessageEmpty
+    case customQueryFormatEmpty
+    case customQueryFormatTooManyAtMark
 
     // MARK: - Localized Description
 
@@ -42,6 +46,12 @@ enum ConfigFileError: Error {
             return "Reviewer の名前が空です。設定ファイルを確認してください。"
         case .reviewerGitHubLoginEmpty:
             return "Reviewer の GitHub の名前が空です。設定ファイルを確認してください。"
+        case .customQueryMessageEmpty:
+            return "Custom Query のメッセージが空です。設定ファイルを確認してください。"
+        case .customQueryFormatEmpty:
+            return "Custom Query のフォーマットが空です。設定ファイルを確認してください。"
+        case .customQueryFormatTooManyAtMark:
+            return "Custom Query のフォーマットに '%@' が多すぎるようです。設定ファイルを確認してください。"
         }
     }
 }

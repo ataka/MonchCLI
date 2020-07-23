@@ -19,6 +19,7 @@ struct PullRequest: ApiResponse {
     let title: String
     let number: Int
     let user: GitHubUser
+    let requestedReviewers: [GitHubUser]
 
     // MARK: - Domain Logic
 

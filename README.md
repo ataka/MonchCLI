@@ -22,6 +22,12 @@ Monch はメンヒと読みます。
 
 Xcode 11.4+ を AppStore からインストールしておきます。
 
+### Homebrew
+
+``` shellsession
+$ brew install ataka/formulae/MonchCLI
+```
+
 ### Make
 
 ``` shellsession
@@ -68,7 +74,7 @@ MonchCLI を使いたいプロジェクトのトップ・ディレクトリー�
     "reviewers": [
         { 
             "name": "安宅正之",    // レビューワーの名前
-            "chatworkId": "67890", // ChatworkのアカウントID
+            "chatworkId": 67890,   // ChatworkのアカウントID
             "githubLogin": "ataka" // GitHub でのログイン名
         }
     ]
@@ -76,6 +82,28 @@ MonchCLI を使いたいプロジェクトのトップ・ディレクトリー�
 ```
 
 コメント部分は削除してください。
+
+#### カスタムクエリー (オプション設定)
+
+Chatwork のタスクに独自の情報を追加することができます。
+`.monch.json` に次のようなフォーマットで設定を追加してください。
+
+``` json5
+{
+    // 省略
+    "customQueries": [
+        {
+            "message": "仕様書の URL を入力してください", // プロンプトに表示するテキスト
+            "format": "仕様書 URL: %@"                    // タスクに挿入されるテキスト
+                                                          //     %@ が入力したテキストに置き換えられます
+        }
+    ]
+}
+```
+
+`customQueries.format` には `%@` を 1 つだけ入れるようにしてください。
+
+`customQueries` はオプション設定です。設定しなくても MonchCLI は動きます。
 
 ## 利用方法
 

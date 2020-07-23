@@ -11,11 +11,15 @@ struct Config {
     let chatwork: Chatwork
     let github: Github
     let reviewers: [Reviewer]
+    let customQueries: [CustomQuery]
 
     func validate() throws {
         try chatwork.validate()
         try github.validate()
         try reviewers.forEach {
+            try $0.validate()
+        }
+        try customQueries.forEach {
             try $0.validate()
         }
     }

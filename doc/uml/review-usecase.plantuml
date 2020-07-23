@@ -1,0 +1,24 @@
+@startuml
+left to right direction
+
+actor :User: as user
+
+rectangle MonchCLI {
+  usecase "Request Review" as review
+'   usecase "Assign Task in Chatwork" as review_chatwork
+'   usecase "Set Reviewer in GitHub" as review_github
+  usecase "Select Pull Request" as select_pr
+  usecase "Select Reviewer" as select_reviewer
+  usecase "Select Deadline" as select_deadline
+  usecase "Answer Custom Queries" as answer_custom_queries
+}
+
+user -- review
+' review <|-l- review_chatwork
+' review <|-l- review_github
+review ..> select_pr : include
+review ..> select_reviewer : include
+review ..> select_deadline : include
+review <.. answer_custom_queries : extend
+
+@enduml

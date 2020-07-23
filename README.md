@@ -22,6 +22,12 @@ Monch はメンヒと読みます。
 
 Xcode 11.4+ を AppStore からインストールしておきます。
 
+### Homebrew
+
+``` shellsession
+$ brew install ataka/formulae/MonchCLI
+```
+
 ### Make
 
 ``` shellsession

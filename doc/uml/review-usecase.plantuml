@@ -10,6 +10,7 @@ rectangle MonchCLI {
   usecase "Select Pull Request" as select_pr
   usecase "Select Reviewer" as select_reviewer
   usecase "Select Deadline" as select_deadline
+  usecase "Answer Custom Queries" as answer_custom_queries
 }
 
 user -- review
@@ -18,5 +19,6 @@ user -- review
 review ..> select_pr : include
 review ..> select_reviewer : include
 review ..> select_deadline : include
+review <.. answer_custom_queries : extend
 
 @enduml

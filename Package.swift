@@ -9,7 +9,7 @@ let package = Package(
         .executable(name: "monch", targets: ["MonchCLI"])
     ],
     dependencies: [
-        .package(url: "https://github.com/apple/swift-argument-parser.git", from: "0.2.0"),
+        .package(url: "https://github.com/apple/swift-argument-parser.git", .upToNextMinor(from: "0.4.0")),
     ],
     targets: [
         .executableTarget(

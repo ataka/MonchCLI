@@ -85,7 +85,7 @@ private extension Array where Element == Reviewer {
 
 struct ChatworkFileObject: Decodable {
     let token: String?
-    let roomId: Int?
+    let roomId: Chatwork.RoomId?
 
     func merging(_ other: Self?) -> Self {
         ChatworkFileObject(

@@ -79,7 +79,7 @@ struct ReviewService {
     func requestReview(for pullRequest: PullRequest, to reviewers: [Reviewer], by deadline: Deadline, withCustomQueryAnswers answers: [CustomQuery.Answer], completionHandler: @escaping () -> Void) {
         guard let deadlineDate = deadline.getDate() else { fatalError() }
         let text = makeTaskText(pullRequest: pullRequest, answers: answers)
-        let chatworkRoomIdMap: [Int: [Reviewer]] = Dictionary(grouping: reviewers) {
+        let chatworkRoomIdMap: [Chatwork.RoomId: [Reviewer]] = Dictionary(grouping: reviewers) {
             $0.chatworkRoomId ?? config.chatwork.roomId
         }
         let group = DispatchGroup()

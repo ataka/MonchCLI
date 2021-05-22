@@ -17,9 +17,18 @@ final class XWWWFormUrlEncoder {
 
     private func format(from keyValues: [String: String]) -> Data {
         keyValues
-            .map { (key, value) in "\(key)=\(value)" }
+            .map { (key, value) in "\(key)=\(value.urlEncoded)" }
             .joined(separator: "&")
             .data(using: .utf8)!
+    }
+}
+
+// refs. https://dev.classmethod.jp/articles/urlencode-spec-and-implementation-for-swift/
+private extension String {
+    var urlEncoded: String {
+        let charset = CharacterSet.alphanumerics.union(.init(charactersIn: "/?-._~"))
+        let removed = removingPercentEncoding ?? self
+        return removed.addingPercentEncoding(withAllowedCharacters: charset) ?? removed
     }
 }
 

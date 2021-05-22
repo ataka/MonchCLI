@@ -46,7 +46,7 @@ struct CreateTaskRequest: ChatworkApiRequest {
         case deadline = "limit"
     }
 
-    var path: String { "rooms/\(roomId)/tasks" }
+    var path: String { "rooms/\(roomId.rawValue)/tasks" }
     var httpMethod: HTTPMethod = .post
 }
 

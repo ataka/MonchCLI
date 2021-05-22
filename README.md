@@ -4,7 +4,7 @@
         <img alt="GitHub license" src="https://img.shields.io/github/license/ataka/MonchCLI"/>
     </a>
     <a href="https://docs.swift.org/swift-book/index.html">
-        <img alt="Swift 5.2" src="https://img.shields.io/badge/Swift-5.2-orange.svg"/>
+        <img alt="Swift 5.4" src="https://img.shields.io/badge/Swift-5.4-orange.svg"/>
     </a>
     <a href="https://github.com/ataka/MonchCLI/releases">
         <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/ataka/MonchCLI">
@@ -20,7 +20,7 @@ Monch はメンヒと読みます。
 
 ## インストール
 
-Xcode 11.4+ を AppStore からインストールしておきます。
+Xcode 12.5+ を AppStore からインストールしておきます。
 
 ### Homebrew
 
@@ -48,7 +48,7 @@ HOME ディレクトリー直下にファイル `.monch.json` を作り、次の
         "token": "01234abcdef" // あなたの Chatwork API トークン
     },
     "github": {
-        "token": "56789uvwxyz" // あなたの GitHub Personal Access トークン
+        "token": "ghp_56789uvwxyz" // あなたの GitHub Personal Access トークン
     }
 }
 ```

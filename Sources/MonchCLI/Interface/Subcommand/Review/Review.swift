@@ -21,7 +21,6 @@ extension Monch {
         mutating func run() {
             let service = makeService()
 
-            let semaphore = DispatchSemaphore(value: 0)
             service.selectPullRequest() { pullRequests, requestedReviewers, authUser in
                 let pullRequest = SelectView<PullRequest>(message: "PR を番号で選択してください",
                                                           items: pullRequests,
@@ -48,13 +47,13 @@ extension Monch {
                             }
                             service.requestReview(for: pullRequest, to: reviewers, by: deadline, withCustomQueryAnswers: answers) {
                                 print("タスクを振りました。")
-                                semaphore.signal()
+                                Monch.Review.exit(withError: nil)
                             }
                         }
                     }
                 }
             }
-            semaphore.wait()
+            dispatchMain()
         }
 
         private func makeService() -> ReviewService {

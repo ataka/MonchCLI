@@ -28,7 +28,7 @@ struct Config {
 extension Config {
     struct Chatwork {
         let token: String
-        let roomId: Int
+        let roomId: ChatworkRoomId
 
         func validate() throws {
             guard !token.isEmpty       else { throw(ConfigFileError.chatworkTokenEmpty) }

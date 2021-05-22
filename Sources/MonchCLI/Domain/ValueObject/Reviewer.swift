@@ -11,6 +11,7 @@ struct Reviewer: Hashable, Decodable {
     let name: String
     let chatworkId: Int
     let githubLogin: GitHubLogin
+    let chatworkRoomId: Int?
 
     // MARK: - Domain Logic
 

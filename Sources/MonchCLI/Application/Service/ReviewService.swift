@@ -53,11 +53,11 @@ struct ReviewService {
 
     // MARK: Select Reviewer
 
-    func selectReviewer(for pullRequest: PullRequest, with requestedReviewers: [GitHubUser], completionHandler: (_ reviewers: [Reviewer], _ loginCountMap: [GitHubLogin: Int]) -> Void) {
+    func selectReviewer(for pullRequest: PullRequest, with requestedReviewers: [GitHubUser], completionHandler: (_ reviewers: [Reviewer], _ loginCountMap: [GitHub.Login: Int]) -> Void) {
         let filteredReviewers = config.reviewers
             .filter(Reviewer.isReviewable(with: pullRequest))
-        let loginCountMap: [GitHubLogin: Int] = requestedReviewers
-            .reduce(into: [GitHubLogin: Int]()) { $0[$1.login, default: 0] += 1 }
+        let loginCountMap: [GitHub.Login: Int] = requestedReviewers
+            .reduce(into: [GitHub.Login: Int]()) { $0[$1.login, default: 0] += 1 }
 
         completionHandler(filteredReviewers, loginCountMap)
     }

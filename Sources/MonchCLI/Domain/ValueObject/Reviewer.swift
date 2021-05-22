@@ -10,7 +10,7 @@ import Foundation
 struct Reviewer: Hashable, Decodable {
     let name: String
     let chatworkId: Chatwork.ID
-    let githubLogin: GitHubLogin
+    let githubLogin: GitHub.Login
     let chatworkRoomId: Chatwork.RoomId?
 
     // MARK: - Domain Logic

@@ -9,7 +9,7 @@ import Foundation
 
 struct Reviewer: Hashable, Decodable {
     let name: String
-    let chatworkId: Int
+    let chatworkId: Chatwork.ID
     let githubLogin: GitHubLogin
     let chatworkRoomId: Chatwork.RoomId?
 

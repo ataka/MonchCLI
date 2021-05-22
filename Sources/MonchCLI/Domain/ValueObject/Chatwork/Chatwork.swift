@@ -8,6 +8,9 @@
 import Foundation
 
 enum Chatwork {
+    struct ID: Codable, Hashable, RawRepresentable {
+        let rawValue: Int
+    }
     struct RoomId: Codable, Hashable, RawRepresentable {
         let rawValue: Int
     }

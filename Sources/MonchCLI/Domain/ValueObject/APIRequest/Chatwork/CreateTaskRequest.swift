@@ -18,11 +18,11 @@ struct CreateTaskRequest: ChatworkApiRequest {
 
     let roomId: Chatwork.RoomId
     let text: String
-    let assigneeIds: [Int]
+    let assigneeIds: [Chatwork.ID]
     let limitType: LimitType
     let deadline: Int?
 
-    init(roomId: Chatwork.RoomId, text: String, assigneeIds: [Int], limitType: LimitType = .none, deadline: Int? = nil) {
+    init(roomId: Chatwork.RoomId, text: String, assigneeIds: [Chatwork.ID], limitType: LimitType = .none, deadline: Int? = nil) {
         self.roomId = roomId
         self.text = text
         self.assigneeIds = assigneeIds
@@ -30,7 +30,7 @@ struct CreateTaskRequest: ChatworkApiRequest {
         self.deadline = deadline
     }
 
-    init(roomId: Chatwork.RoomId, text: String, assigneeIds: [Int], limitType: LimitType = .none, deadline: Date) {
+    init(roomId: Chatwork.RoomId, text: String, assigneeIds: [Chatwork.ID], limitType: LimitType = .none, deadline: Date) {
         let deadlineInt = Int(deadline.timeIntervalSince1970)
         self.init(roomId: roomId,
                   text: text,

@@ -105,6 +105,34 @@ Chatwork のタスクに独自の情報を追加することができます。
 
 `customQueries` はオプション設定です。設定しなくても MonchCLI は動きます。
 
+#### タスクを振るルームIDの上書き (オプション設定)
+
+Chatwork のタスクを振るルームを特定のレビュワーだけ変更することができます。
+`.monch.json` に次のようなフォーマットで設定を書いてください。
+
+``` json5
+{
+    "chatwork": {
+        "roomId": 12345 // タスクを振る Chatwork のルームID
+    },
+    // 省略
+    "reviewers": [
+        // 省略
+        {
+            "name": "別チームの開発者・デザイナー・テスター etc.",
+            "chatworkId": 67891,
+            "githubLogin": "someoneInOtherChat",
+            "chatworkRoomId": 12346 // (Optional) chatwork.roomId で設定した「タスクを振る Chatwork のルームID」を上書きできます
+        }
+    ]
+}
+```
+
+デフォールトでは、Chatwork のタスクは `chatwork.roomId` のチャットで作成されますが、
+`reviewers[N].chatworkRoomId` を設定しているとこの設定を上書きして別のチャットでタスクを作成することが可能です。
+
+`reviewers[N].chatworkRoomId` はオプション設定です。設定しなくても MonchCLI は動きます。
+
 ## 利用方法
 
 プロジェクトのトップ・ディレクトリー下で次のコマンドを打ちます:

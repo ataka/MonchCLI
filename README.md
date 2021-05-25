@@ -147,6 +147,29 @@ $ monch
 $ monch --help
 ```
 
+## Completion Script のインストール
+
+MonchCLI の Completion Script をインストールすることができます。
+本節では zsh 用の Completion Script のインストール方法を説明します。
+zsh 以外の shell のインストール方法については [swift\-argument\-parser のドキュメント](https://github.com/apple/swift-argument-parser/blob/main/Documentation/07%20Completion%20Scripts.md) を参照してください。
+
+`~/.zshrc` に次の設定を書きます。
+
+``` zsh
+fpath=(~/.zsh/completion $fpath)
+autoload -U compinit
+compinit
+```
+
+`~/.zsh/completion` ディレクトリーを作成して、`monch` コマンドから補完ファイルを作成します:
+
+``` shellsession
+$ mkdir -p ~/.zsh/completion
+$ monch --generate-completion-script zsh > ~/.zsh/completion/_monch
+```
+
+zsh を起動し直せば補完が効くようになるはずです。
+
 ## Attributions
 
 This tool is powered by:

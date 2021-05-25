@@ -28,7 +28,7 @@ struct Config {
 extension Config {
     struct Chatwork {
         let token: String
-        let roomId: Int
+        let roomId: ChatworkRoomId
 
         func validate() throws {
             guard !token.isEmpty       else { throw(ConfigFileError.chatworkTokenEmpty) }
@@ -44,9 +44,14 @@ extension Config {
         let repository: String
 
         func validate() throws {
-            guard !token.isEmpty       else { throw(ConfigFileError.gitHubTokenEmpty) }
-            guard token.isAlphaNumeric else { throw(ConfigFileError.gitHubTokenWrongCharacter) }
+            guard !token.isEmpty      else { throw(ConfigFileError.gitHubTokenEmpty) }
+            guard isValidToken(token) else { throw(ConfigFileError.gitHubTokenWrongCharacter) }
             return
+        }
+
+        // https://github.blog/changelog/2021-03-31-authentication-token-format-updates-are-generally-available/
+        private func isValidToken(_ token: String) -> Bool {
+            token.range(of: "[^A-Za-z0-9_]", options: .regularExpression) == nil
         }
     }
 }

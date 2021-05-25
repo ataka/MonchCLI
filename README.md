@@ -4,7 +4,7 @@
         <img alt="GitHub license" src="https://img.shields.io/github/license/ataka/MonchCLI"/>
     </a>
     <a href="https://docs.swift.org/swift-book/index.html">
-        <img alt="Swift 5.2" src="https://img.shields.io/badge/Swift-5.2-orange.svg"/>
+        <img alt="Swift 5.4" src="https://img.shields.io/badge/Swift-5.4-orange.svg"/>
     </a>
     <a href="https://github.com/ataka/MonchCLI/releases">
         <img alt="GitHub release (latest by date)" src="https://img.shields.io/github/v/release/ataka/MonchCLI">
@@ -20,7 +20,7 @@ Monch はメンヒと読みます。
 
 ## インストール
 
-Xcode 11.4+ を AppStore からインストールしておきます。
+Xcode 12.5+ を AppStore からインストールしておきます。
 
 ### Homebrew
 
@@ -48,7 +48,7 @@ HOME ディレクトリー直下にファイル `.monch.json` を作り、次の
         "token": "01234abcdef" // あなたの Chatwork API トークン
     },
     "github": {
-        "token": "56789uvwxyz" // あなたの GitHub Personal Access トークン
+        "token": "ghp_56789uvwxyz" // あなたの GitHub Personal Access トークン
     }
 }
 ```
@@ -73,7 +73,7 @@ MonchCLI を使いたいプロジェクトのトップ・ディレクトリー�
     },
     "reviewers": [
         { 
-            "name": "安宅正之",    // レビューワーの名前
+            "name": "安宅正之",     // レビューワーの名前
             "chatworkId": 67890,   // ChatworkのアカウントID
             "githubLogin": "ataka" // GitHub でのログイン名
         }
@@ -94,8 +94,8 @@ Chatwork のタスクに独自の情報を追加することができます。
     "customQueries": [
         {
             "message": "仕様書の URL を入力してください", // プロンプトに表示するテキスト
-            "format": "仕様書 URL: %@"                    // タスクに挿入されるテキスト
-                                                          //     %@ が入力したテキストに置き換えられます
+            "format": "仕様書 URL: %@"                 // タスクに挿入されるテキスト
+                                                      //     %@ が入力したテキストに置き換えられます
         }
     ]
 }
@@ -104,6 +104,34 @@ Chatwork のタスクに独自の情報を追加することができます。
 `customQueries.format` には `%@` を 1 つだけ入れるようにしてください。
 
 `customQueries` はオプション設定です。設定しなくても MonchCLI は動きます。
+
+#### タスクを振るルームIDの上書き (オプション設定)
+
+Chatwork のタスクを振るルームを特定のレビュワーだけ変更することができます。
+`.monch.json` に次のようなフォーマットで設定を書いてください。
+
+``` json5
+{
+    "chatwork": {
+        "roomId": 12345 // タスクを振る Chatwork のルームID
+    },
+    // 省略
+    "reviewers": [
+        // 省略
+        {
+            "name": "別チームの開発者・デザイナー・テスター etc.",
+            "chatworkId": 67891,
+            "githubLogin": "someoneInOtherChat",
+            "chatworkRoomId": 12346 // (Optional) chatwork.roomId で設定した「タスクを振る Chatwork のルームID」を上書きできます
+        }
+    ]
+}
+```
+
+デフォールトでは、Chatwork のタスクは `chatwork.roomId` のチャットで作成されますが、
+`reviewers[N].chatworkRoomId` を設定しているとこの設定を上書きして別のチャットでタスクを作成することが可能です。
+
+`reviewers[N].chatworkRoomId` はオプション設定です。設定しなくても MonchCLI は動きます。
 
 ## 利用方法
 
@@ -118,6 +146,29 @@ $ monch
 ``` shellsession
 $ monch --help
 ```
+
+## Completion Script のインストール
+
+MonchCLI の Completion Script をインストールすることができます。
+本節では zsh 用の Completion Script のインストール方法を説明します。
+zsh 以外の shell のインストール方法については [swift\-argument\-parser のドキュメント](https://github.com/apple/swift-argument-parser/blob/main/Documentation/07%20Completion%20Scripts.md) を参照してください。
+
+`~/.zshrc` に次の設定を書きます。
+
+``` zsh
+fpath=(~/.zsh/completion $fpath)
+autoload -U compinit
+compinit
+```
+
+`~/.zsh/completion` ディレクトリーを作成して、`monch` コマンドから補完ファイルを作成します:
+
+``` shellsession
+$ mkdir -p ~/.zsh/completion
+$ monch --generate-completion-script zsh > ~/.zsh/completion/_monch
+```
+
+zsh を起動し直せば補完が効くようになるはずです。
 
 ## Attributions
 

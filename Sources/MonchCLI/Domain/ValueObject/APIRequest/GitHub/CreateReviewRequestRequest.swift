@@ -12,7 +12,7 @@ struct CreateReviewRequestRequest: GithubApiRequest {
 
     let repository: String
     let pullRequestId: Int
-    let reviewers: [GitHubLogin]
+    let reviewers: [GitHub.Login]
 
     private enum CodingKeys: String, CodingKey {
         case reviewers

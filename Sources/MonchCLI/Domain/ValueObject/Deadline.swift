@@ -10,6 +10,7 @@ import Foundation
 enum Deadline: Int, CaseIterable {
     case today
     case aFewDaysLater
+    case oneWeekLater
     case twoWeeksLater
 
     var string: String {
@@ -18,8 +19,10 @@ enum Deadline: Int, CaseIterable {
             return "急いでいます。今日中で!!"
         case .aFewDaysLater:
             return "時間のある時にやって欲しいです。二営業日以内で!"
+        case .oneWeekLater:
+            return "そんなに急いでいません。一週間以内で!"
         case .twoWeeksLater:
-            return "急いでいません。でも忘れてもらっては困ります。二週間以内に。"
+            return "全然急いでいません。でも忘れてもらっては困ります。二週間以内に。"
         }
     }
 
@@ -39,6 +42,8 @@ enum Deadline: Int, CaseIterable {
             default:
                 fatalError("NO DAY of WEEK")
             }
+        case .oneWeekLater:
+            adding.day = 7
         case .twoWeeksLater:
             adding.day = 14
         }

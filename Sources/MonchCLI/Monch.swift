@@ -1,6 +1,7 @@
 import Foundation
 import ArgumentParser
 
+@main
 struct Monch: ParsableCommand {
     static var configuration = CommandConfiguration(
         abstract: "レビュー依頼を楽にするコマンドライン・ツール",
@@ -10,6 +11,3 @@ struct Monch: ParsableCommand {
     )
     static let filePath = #file
 }
-
-Monch.main()
-

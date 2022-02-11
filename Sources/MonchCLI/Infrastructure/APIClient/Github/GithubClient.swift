@@ -44,7 +44,7 @@ struct GithubClient {
     }
 
     func send<Request: GithubApiBaseRequest>(_ request: Request) async -> Request.Response {
-        return await withUnsafeContinuation { continuation in
+        await withUnsafeContinuation { continuation in
             send(request) { response in
                 continuation.resume(returning: response)
             }

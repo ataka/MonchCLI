@@ -49,57 +49,49 @@ struct ReviewService {
 
     // MARK: Select Reviewer
 
-    func selectReviewer(for pullRequest: PullRequest, with requestedReviewers: [GitHubUser], completionHandler: (_ reviewers: [Reviewer], _ loginCountMap: [GitHub.Login: Int]) -> Void) {
+    func selectReviewer(for pullRequest: PullRequest, with requestedReviewers: [GitHubUser]) -> (reviewers: [Reviewer], loginCountMap: [GitHub.Login: Int]) {
         let filteredReviewers = config.reviewers
             .filter(Reviewer.isReviewable(with: pullRequest))
         let loginCountMap: [GitHub.Login: Int] = requestedReviewers
             .reduce(into: [GitHub.Login: Int]()) { $0[$1.login, default: 0] += 1 }
 
-        completionHandler(filteredReviewers, loginCountMap)
+        return(reviewers: filteredReviewers, loginCountMap: loginCountMap)
     }
 
     // MARK: Select Deadline
 
-    func selectDeadline(completionHandler: (_ deadlines: [Deadline]) -> Void) {
-        completionHandler(Deadline.allCases)
+    func selectDeadline() -> [Deadline] {
+        Deadline.allCases
     }
 
     // MARK: Answer Custom Query
 
-    func answerCustomQuery(completionHandler: (_ customQueries: [CustomQuery]) -> Void) {
-        completionHandler(config.customQueries)
+    func answerCustomQuery() -> [CustomQuery] {
+        config.customQueries
     }
 
     // MARK: Request Review
 
-    func requestReview(for pullRequest: PullRequest, to reviewers: [Reviewer], by deadline: Deadline, withCustomQueryAnswers answers: [CustomQuery.Answer], completionHandler: @escaping () -> Void) {
+    func requestReview(for pullRequest: PullRequest, to reviewers: [Reviewer], by deadline: Deadline, withCustomQueryAnswers answers: [CustomQuery.Answer]) async {
         guard let deadlineDate = deadline.getDate() else { fatalError() }
         let text = makeTaskText(pullRequest: pullRequest, answers: answers)
         let chatworkRoomIdMap: [Chatwork.RoomId: [Reviewer]] = Dictionary(grouping: reviewers) {
             $0.chatworkRoomId ?? config.chatwork.roomId
         }
-        let group = DispatchGroup()
         for (chatworkRoomId, assignees) in chatworkRoomIdMap {
-            group.enter()
             let request = CreateTaskRequest(roomId: chatworkRoomId,
                                             text: text,
                                             assigneeIds: assignees.map(\.chatworkId),
                                             limitType: .date,
                                             deadline: deadlineDate)
-            chatworkClient.send(request) { _ in
-                group.leave()
-            }
+            _ = await chatworkClient.send(request)
         }
 
-        group.notify(queue: DispatchQueue.main) { [self] in
-            // Create ReviewRequest for GitHub
-            let request = CreateReviewRequestRequest(repository: config.github.repository,
-                                                     pullRequestId: pullRequest.number,
-                                                     reviewers: reviewers.map(\.githubLogin))
-            gitHubClient.send(request) { pullRequest in
-                completionHandler()
-            }
-        }
+        // Create ReviewRequest for GitHub
+        let request = CreateReviewRequestRequest(repository: config.github.repository,
+                                                 pullRequestId: pullRequest.number,
+                                                 reviewers: reviewers.map(\.githubLogin))
+        _ = await gitHubClient.send(request)
     }
 
     private func makeTaskText(pullRequest: PullRequest, answers: [CustomQuery.Answer]) -> String {

@@ -20,21 +20,19 @@ struct ReviewService {
 
     // MARK: Select Pull Request
 
-    func selectPullRequest(completionHandler: @escaping (_ pullRequests: ArraySlice<PullRequest>, _ requestedReviewers: [GitHubUser], _ authUser: GitHubUser) -> Void) {
-        getAuthenticatedUser(clearsCache: option.clearsCache) { authUser in
-            let request = ListPullRequestsRequest(config: self.config.github)
-            self.gitHubClient.send(request) { pullRequests in
-                let filteredPullRequests = pullRequests
-                    .filter(PullRequest.isListable(showsAll: self.option.showsAllPullRequests, authenticatedUser: authUser))
-                    .prefix(8)
-                let requestedReviewers = pullRequests.flatMap(\.requestedReviewers)
+    func selectPullRequest() async -> (pullRequests: ArraySlice<PullRequest>, requestedReviewers: [GitHubUser], authUser: GitHubUser) {
+        let authUser = await getAuthenticatedUser(clearsCache: option.clearsCache)
+        let request = ListPullRequestsRequest(config: self.config.github)
+        let pullRequests = await gitHubClient.send(request)
+        let filteredPullRequests = pullRequests
+            .filter(PullRequest.isListable(showsAll: self.option.showsAllPullRequests, authenticatedUser: authUser))
+            .prefix(8)
+        let requestedReviewers = pullRequests.flatMap(\.requestedReviewers)
 
-                completionHandler(filteredPullRequests, requestedReviewers, authUser)
-            }
-        }
+        return (pullRequests: filteredPullRequests, requestedReviewers: requestedReviewers, authUser: authUser)
     }
 
-    private func getAuthenticatedUser(clearsCache: Bool, completionHandler: @escaping (GitHubUser) -> Void) {
+    private func getAuthenticatedUser(clearsCache: Bool) async -> GitHubUser {
         let repository = GitHubAuthUserRepository()
         if clearsCache {
             repository.delete()
@@ -42,13 +40,11 @@ struct ReviewService {
 
         guard let authUser = repository.fetch() else {
             let request = GetAuthenticatedUserRequest()
-            gitHubClient.send(request) { authUser in
-                repository.save(authUser)
-                completionHandler(authUser)
-            }
-            return
+            let authUser = await gitHubClient.send(request)
+            repository.save(authUser)
+            return authUser
         }
-        completionHandler(authUser)
+        return authUser
     }
 
     // MARK: Select Reviewer

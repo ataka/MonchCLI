@@ -9,7 +9,7 @@ import Foundation
 import ArgumentParser
 
 extension Monch {
-    struct Review: ParsableCommand {
+    struct Review: ParsableCommand, AsyncParsableCommand {
         static var configuration = CommandConfiguration(abstract: "PR のレビューを依頼する")
 
         @Flag(name: [.long, .customShort("c")], help: "GitHub ユーザーのキャッシュをクリアします")
@@ -18,7 +18,7 @@ extension Monch {
         @Flag(name: [.long, .customShort("a")], help: "すべての PR を表示します")
         var showsAllPullRequests: Bool = false
 
-        mutating func run() {
+        mutating func runAsync() async throws {
             let service = makeService()
 
             service.selectPullRequest() { pullRequests, requestedReviewers, authUser in

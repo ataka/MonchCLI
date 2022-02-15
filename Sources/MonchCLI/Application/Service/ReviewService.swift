@@ -78,13 +78,21 @@ struct ReviewService {
         let chatworkRoomIdMap: [Chatwork.RoomId: [Reviewer]] = Dictionary(grouping: reviewers) {
             $0.chatworkRoomId ?? config.chatwork.roomId
         }
-        for (chatworkRoomId, assignees) in chatworkRoomIdMap {
-            let request = CreateTaskRequest(roomId: chatworkRoomId,
-                                            text: text,
-                                            assigneeIds: assignees.map(\.chatworkId),
-                                            limitType: .date,
-                                            deadline: deadlineDate)
-            _ = await chatworkClient.send(request)
+        var tasks: [CreateTaskResponse] = []
+        await withTaskGroup(of: CreateTaskResponse.self) { group in
+            for (chatworkRoomId, assignees) in chatworkRoomIdMap {
+                group.addTask {
+                    let request = CreateTaskRequest(roomId: chatworkRoomId,
+                                                    text: text,
+                                                    assigneeIds: assignees.map(\.chatworkId),
+                                                    limitType: .date,
+                                                    deadline: deadlineDate)
+                    return await chatworkClient.send(request)
+                }
+            }
+            for await task in group {
+                tasks.append(task)
+            }
         }
 
         // Create ReviewRequest for GitHub

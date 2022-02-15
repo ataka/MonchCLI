@@ -42,4 +42,12 @@ struct ChatworkClient {
         }
         task.resume()
     }
+
+    func send<Request: ChatworkApiRequest>(_ request: Request) async -> Request.Response {
+        await withUnsafeContinuation { continuation in
+            send(request) { response in
+                continuation.resume(returning: response)
+            }
+        }
+    }
 }

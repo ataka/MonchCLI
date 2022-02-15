@@ -43,5 +43,13 @@ struct GithubClient {
         task.resume()
     }
 
+    func send<Request: GithubApiBaseRequest>(_ request: Request) async -> Request.Response {
+        await withUnsafeContinuation { continuation in
+            send(request) { response in
+                continuation.resume(returning: response)
+            }
+        }
+    }
+
     private var authorization: String { "token \(config.token)" }
 }

@@ -126,7 +126,7 @@ extension Config {
 }
 
 private func checkNil<T>(_ x: T) throws {
-    func checkNil<T>(_ x: T, labels: [String]) throws -> Bool {
+    func checkNil<S>(_ x: S, labels: [String]) throws -> Bool {
         let mirror = Mirror(reflecting: x)
         guard let displayStyle = mirror.displayStyle else { return true }
 

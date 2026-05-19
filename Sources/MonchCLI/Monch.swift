@@ -3,7 +3,7 @@ import ArgumentParser
 
 @main
 struct Monch: ParsableCommand {
-    static var configuration = CommandConfiguration(
+    static let configuration = CommandConfiguration(
         abstract: "レビュー依頼を楽にするコマンドライン・ツール",
         version: Version.value,
         subcommands: [Review.self],

@@ -10,7 +10,7 @@ import ArgumentParser
 
 extension Monch {
     struct Review: ParsableCommand {
-        static var configuration = CommandConfiguration(abstract: "PR のレビューを依頼する")
+        static let configuration = CommandConfiguration(abstract: "PR のレビューを依頼する")
 
         @Flag(name: [.long, .customShort("c")], help: "GitHub ユーザーのキャッシュをクリアします")
         var clearCache: Bool = false

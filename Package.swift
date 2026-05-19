@@ -5,6 +5,9 @@ import PackageDescription
 
 let package = Package(
     name: "MonchCLI",
+    platforms: [
+        .macOS(.v15),
+    ],
     products: [
         .executable(name: "monch", targets: ["MonchCLI"])
     ],

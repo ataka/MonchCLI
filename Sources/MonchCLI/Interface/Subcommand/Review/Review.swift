@@ -9,8 +9,8 @@ import Foundation
 import ArgumentParser
 
 extension Monch {
-    struct Review: ParsableCommand {
-        static var configuration = CommandConfiguration(abstract: "PR のレビューを依頼する")
+    struct Review: AsyncParsableCommand {
+        static let configuration = CommandConfiguration(abstract: "PR のレビューを依頼する")
 
         @Flag(name: [.long, .customShort("c")], help: "GitHub ユーザーのキャッシュをクリアします")
         var clearCache: Bool = false
@@ -18,42 +18,39 @@ extension Monch {
         @Flag(name: [.long, .customShort("a")], help: "すべての PR を表示します")
         var showsAllPullRequests: Bool = false
 
-        mutating func run() {
+        mutating func run() async throws {
             let service = makeService()
 
-            service.selectPullRequest() { pullRequests, requestedReviewers, authUser in
-                let pullRequest = SelectView<PullRequest>(message: "PR を番号で選択してください",
-                                                          items: pullRequests,
-                                                          getTitleHandler: \.title).getItem()
-                service.selectReviewer(for: pullRequest, with: requestedReviewers) { reviewerList, loginCountMap in
-                    let reviewers = SelectView<Reviewer>(message: "レビュワーを選んでください",
-                                                         hint: "(数字) は、その候補者が何本の PR をレビュー中かを表します",
-                                                         items: reviewerList,
-                                                         getTitleHandler: {
-                                                            if let count = loginCountMap[$0.githubLogin] {
-                                                                return "\($0.name) (\(count))"
-                                                            } else {
-                                                                return "\($0.name)"
-                                                            }
-                    }).getItems()
-                    service.selectDeadline { deadlineList in
-                        let deadline = SelectView<Deadline>(message: "しめ切りを設定してください",
-                                                            items: deadlineList,
-                                                            getTitleHandler: \.string).getItem()
-                        service.answerCustomQuery { customQueries in
-                            let answers: [CustomQuery.Answer] = customQueries.map {
-                                TextReader<CustomQuery.Answer>(message: $0.message, completionHandler: $0.getAnswer(with:))
-                                    .read()
-                            }
-                            service.requestReview(for: pullRequest, to: reviewers, by: deadline, withCustomQueryAnswers: answers) {
-                                print("タスクを振りました。")
-                                Monch.Review.exit(withError: nil)
-                            }
-                        }
-                    }
+            let (pullRequests, requestedReviewers, _) = try await service.selectPullRequest()
+            let pullRequest = SelectView<PullRequest>(message: "PR を番号で選択してください",
+                                                      items: pullRequests,
+                                                      getTitleHandler: \.title).getItem()
+
+            let (reviewerList, loginCountMap) = service.selectReviewer(for: pullRequest, with: requestedReviewers)
+            let reviewers = SelectView<Reviewer>(message: "レビュワーを選んでください",
+                                                 hint: "(数字) は、その候補者が何本の PR をレビュー中かを表します",
+                                                 items: reviewerList,
+                                                 getTitleHandler: {
+                if let count = loginCountMap[$0.githubLogin] {
+                    return "\($0.name) (\(count))"
+                } else {
+                    return "\($0.name)"
                 }
+            }).getItems()
+
+            let deadlineList = service.selectDeadline()
+            let deadline = SelectView<Deadline>(message: "しめ切りを設定してください",
+                                                items: deadlineList,
+                                                getTitleHandler: \.string).getItem()
+            let customQueries = service.answerCustomQuery()
+            let answers: [CustomQuery.Answer] = customQueries.map {
+                TextReader<CustomQuery.Answer>(message: $0.message, completionHandler: $0.getAnswer(with:))
+                    .read()
             }
-            dispatchMain()
+
+            try await service.requestReview(for: pullRequest, to: reviewers, by: deadline, withCustomQueryAnswers: answers)
+            print("タスクを振りました。")
+            Monch.Review.exit(withError: nil)
         }
 
         private func makeService() -> ReviewService {

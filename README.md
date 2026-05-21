@@ -20,7 +20,7 @@ Monch はメンヒと読みます。
 
 ## インストール
 
-Xcode 12.5+ を AppStore からインストールしておきます。
+Xcode 26.0+ を AppStore からインストールしておきます。
 
 ### Homebrew
 

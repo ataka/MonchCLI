@@ -2,7 +2,7 @@ import Foundation
 import ArgumentParser
 
 @main
-struct Monch: ParsableCommand {
+struct Monch: AsyncParsableCommand {
     static let configuration = CommandConfiguration(
         abstract: "レビュー依頼を楽にするコマンドライン・ツール",
         version: Version.value,

@@ -9,5 +9,5 @@ struct Monch: AsyncParsableCommand {
         subcommands: [Review.self],
         defaultSubcommand: Review.self
     )
-    static let filePath = #file
+    static let filePath = #filePath
 }
